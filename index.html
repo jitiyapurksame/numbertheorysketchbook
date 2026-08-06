@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Number Theory">
+<title>J.J.'s Number Theory Sketchbook — Ship's Bridge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(18px + env(safe-area-inset-top)) 16px 16px;
+    border-bottom:4px solid var(--accent-brass);
+    text-align:center;
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:4px 0 4px; font-size:22px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13.5px; color:var(--line-blueprint); opacity:0.9; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  main{ max-width:720px; margin:0 auto; padding:16px 14px calc(30px + env(safe-area-inset-bottom)); }
+
+  .voyagebar{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius);
+    padding:16px; margin-bottom:18px; border:2px dashed var(--accent-brass);
+  }
+  .voyagebar .vtitle{ font-family:'Space Mono',monospace; font-size:12px; letter-spacing:1px; color:var(--accent-brass-light); text-transform:uppercase; margin-bottom:8px; }
+  .voyagebar .vstat{ font-family:'Space Mono',monospace; font-size:15px; font-weight:700; margin-bottom:10px; }
+  .progresstrack{ background:rgba(255,255,255,0.12); border-radius:20px; height:14px; overflow:hidden; }
+  .progressfill{ background:linear-gradient(90deg, var(--success), var(--accent-brass-light)); height:100%; border-radius:20px; transition:width .4s ease; }
+
+  .sectionlabel{
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--accent-brass-dark); font-weight:700; margin:20px 4px 8px;
+  }
+
+  .card{
+    background:#fff; border-radius:var(--radius); padding:14px 16px; margin-bottom:10px;
+    box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8;
+    display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit;
+    transition:transform .1s ease;
+  }
+  .card:active{ transform:scale(0.98); }
+  .card.locked{ opacity:0.55; }
+  .cardicon{
+    width:46px;height:46px; border-radius:10px; background:var(--bg-blueprint); color:var(--text-on-blueprint);
+    display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;
+  }
+  .card.locked .cardicon{ background:var(--bg-paper-alt); color:var(--text-ink-soft); }
+  .cardbody{ flex:1; min-width:0; }
+  .cardnum{ font-family:'Space Mono',monospace; font-size:10px; color:var(--accent-brass-dark); font-weight:700; letter-spacing:1px; }
+  .cardtitle{ font-family:'Space Mono',monospace; font-size:14.5px; font-weight:700; margin:1px 0 2px; }
+  .cardtheme{ font-size:12.5px; color:var(--text-ink-soft); line-height:1.3; }
+  .cardstatus{ flex-shrink:0; text-align:right; }
+  .badge{
+    font-family:'Space Mono',monospace; font-size:10px; font-weight:700; padding:4px 8px; border-radius:20px;
+    white-space:nowrap; display:inline-block;
+  }
+  .badge.start{ background:var(--accent-brass-light); color:#5C3E1B; }
+  .badge.continue{ background:var(--alert); color:#402A08; }
+  .badge.done{ background:var(--success); color:#fff; }
+  .badge.locked{ background:var(--bg-paper-alt); color:var(--text-ink-soft); }
+  .minidots{ display:flex; gap:3px; margin-top:5px; justify-content:flex-end; }
+  .minidots span{ width:6px;height:6px;border-radius:50%; background:var(--bg-paper-alt); }
+  .minidots span.on{ background:var(--success); }
+
+  .storagenote{
+    font-size:11.5px; color:var(--text-ink-soft); text-align:center; margin-top:22px; padding:0 10px; line-height:1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Ship's Bridge</div>
+  <h1>⚓ J.J.'s Number Theory Sketchbook</h1>
+  <div class="sub">Chief Engineer Training Manual — 15 Compartments</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — PICK A COMPARTMENT AND START</div>
+
+<main id="main"></main>
+
+<script>
+const MODULES = [
+  { n:1,  file:'module1_numbers.html',      key:null,               icon:'📋', title:'Numbers',              theme:'Ship\u2019s Manifest \u2014 sorting whole crates, tanks & ballast' },
+  { n:2,  file:'module2_primes.html',       key:'nts_m2_titanic',   icon:'⚓', title:'Prime Numbers',        theme:'Watertight Compartments \u2014 sections that can\u2019t be split' },
+  { n:3,  file:'module3_factors.html',      key:'nts_m3_factors',   icon:'📦', title:'Factors',              theme:'Cargo Container Manifest \u2014 every way to load the hold' },
+  { n:4,  file:'module4_multiples.html',    key:'nts_m4_multiples', icon:'🔔', title:'Multiples',            theme:'Convoy Bell Schedule \u2014 when do the bells ring together?' },
+  { n:5,  file:'module5_divisibility.html', key:null,               icon:'🧪', title:'Divisibility',         theme:'Chemistry Mixing Ratios \u2014 does the batch split evenly?' },
+  { n:6,  file:'module6_primefactor.html',  key:null,               icon:'🏗️', title:'Prime Factorisation',  theme:'Engine Room Towers \u2014 building blocks of every number' },
+  { n:7,  file:'module7_gcflcm.html',       key:null,               icon:'📐', title:'GCF & LCM',            theme:'Dry Dock Rectangles \u2014 area models for shared factors' },
+  { n:8,  file:'module8_powers.html',       key:null,               icon:'📏', title:'Powers',               theme:'Ship Scaling Blueprints \u2014 squares, cubes & patterns' },
+  { n:9,  file:'module9_modular.html',      key:null,               icon:'🕐', title:'Modular Arithmetic',   theme:'Ship\u2019s Clock \u2014 crew shift rotations & cycles' },
+  { n:10, file:'module10_evenodd.html',     key:null,               icon:'🛟', title:'Even & Odd',           theme:'Lifeboat Pairing \u2014 proving parity with pairs' },
+  { n:11, file:'module11_patterns.html',    key:null,               icon:'🍄', title:'Number Patterns',      theme:'Level Sequences \u2014 triangular, square, Fibonacci' },
+  { n:12, file:'module12_digitalroot.html', key:null,               icon:'⛽', title:'Digital Root',         theme:'Fuel Gauge Check \u2014 a fast divisibility shortcut' },
+  { n:13, file:'module13_diophantine.html', key:null,               icon:'⚖️', title:'Diophantine',          theme:'Cargo Balancing \u2014 whole-number solutions only' },
+  { n:14, file:'module14_proof.html',       key:null,               icon:'📓', title:'Proof',                theme:'Inspector\u2019s Logbook \u2014 Always, Sometimes, Never' },
+  { n:15, file:'module15_olympiad.html',    key:null,               icon:'🧭', title:'Olympiad Toolbox',     theme:'Captain\u2019s Strategy Manual \u2014 parity, invariants, cases' }
+];
+
+function readProgress(key){
+  if(!key) return null;
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return null;
+    const state = JSON.parse(raw);
+    if(!state || !Array.isArray(state.completed)) return null;
+    return state.completed.filter(Boolean).length;
+  }catch(e){
+    return null;
+  }
+}
+
+function renderDots(done){
+  let html = '<div class="minidots">';
+  for(let i=0;i<5;i++){
+    html += `<span class="${i<done?'on':''}"></span>`;
+  }
+  return html + '</div>';
+}
+
+function render(){
+  const builtModules = MODULES.filter(m => m.key !== null);
+  let totalDone = 0;
+  builtModules.forEach(m=>{ totalDone += (readProgress(m.key) || 0); });
+  const totalPossible = builtModules.length * 5;
+  const pct = totalPossible ? Math.round((totalDone/totalPossible)*100) : 0;
+
+  let html = `
+  <div class="voyagebar">
+    <div class="vtitle">🧭 Voyage Progress</div>
+    <div class="vstat">${totalDone} / ${totalPossible} stages logged across ${builtModules.length} built compartment${builtModules.length===1?'':'s'}</div>
+    <div class="progresstrack"><div class="progressfill" style="width:${pct}%"></div></div>
+  </div>
+  <div class="sectionlabel">Ready to Sail</div>`;
+
+  MODULES.filter(m=>m.key!==null).forEach(m=>{ html += renderCard(m); });
+
+  html += `<div class="sectionlabel">Under Construction</div>`;
+  MODULES.filter(m=>m.key===null).forEach(m=>{ html += renderCard(m); });
+
+  html += `<div class="storagenote">Progress is saved on this device only, per module. If you open a module by AirDropped file instead of through this page, progress-saving may be limited to that session.</div>`;
+
+  document.getElementById('main').innerHTML = html;
+}
+
+function renderCard(m){
+  const isBuilt = m.key !== null;
+  if(!isBuilt){
+    return `
+    <div class="card locked">
+      <div class="cardicon">${m.icon}</div>
+      <div class="cardbody">
+        <div class="cardnum">MODULE ${m.n}</div>
+        <div class="cardtitle">${m.title}</div>
+        <div class="cardtheme">${m.theme}</div>
+      </div>
+      <div class="cardstatus"><span class="badge locked">🔧 Coming Soon</span></div>
+    </div>`;
+  }
+  const done = readProgress(m.key) || 0;
+  let badge = `<span class="badge start">Start Mission</span>`;
+  if(done>0 && done<5) badge = `<span class="badge continue">Continue (${done}/5)</span>`;
+  if(done>=5) badge = `<span class="badge done">✅ Completed</span>`;
+  return `
+  <a class="card" href="${m.file}">
+    <div class="cardicon">${m.icon}</div>
+    <div class="cardbody">
+      <div class="cardnum">MODULE ${m.n}</div>
+      <div class="cardtitle">${m.title}</div>
+      <div class="cardtheme">${m.theme}</div>
+    </div>
+    <div class="cardstatus">${badge}${renderDots(done)}</div>
+  </a>`;
+}
+
+render();
+</script>
+</body>
+</html>

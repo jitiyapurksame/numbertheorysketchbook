@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Prime Numbers">
+<title>Module 2: Prime Numbers — Watertight Compartments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  /* ===== Header ===== */
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--line-blueprint-dim);
+    text-transform:uppercase;
+  }
+  .topbar h1{
+    margin:2px 0 2px;
+    font-size:20px;
+    letter-spacing:0.5px;
+  }
+  .topbar .sub{
+    font-size:13px;
+    color:var(--line-blueprint);
+    opacity:0.85;
+  }
+
+  .motto{
+    background:var(--accent-brass);
+    color:#2A1B0C;
+    text-align:center;
+    font-family:'Space Mono',monospace;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  /* ===== Progress dots ===== */
+  .stagebar{
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+    padding:12px 14px 4px;
+    max-width:720px;
+    margin:0 auto;
+  }
+  .stagebtn{
+    flex:1;
+    text-align:center;
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:6px 2px;
+    font-family:'Space Mono',monospace;
+    font-size:10px;
+    color:var(--text-ink-soft);
+  }
+  .stagebtn .dot{
+    width:30px;height:30px;
+    border-radius:50%;
+    background:#fff;
+    border:2.5px solid var(--bg-paper-alt);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 4px;
+    font-size:15px;
+    transition: all .2s;
+  }
+  .stagebtn.active .dot{
+    border-color:var(--accent-brass);
+    background:var(--accent-brass-light);
+    transform:scale(1.12);
+  }
+  .stagebtn.done .dot{
+    border-color:var(--success);
+    background:var(--success);
+    color:#fff;
+  }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  /* ===== Main container ===== */
+  main{
+    max-width:720px;
+    margin:0 auto;
+    padding:10px 14px calc(90px + env(safe-area-inset-bottom));
+  }
+  .panel{
+    background:#fff;
+    border-radius:var(--radius);
+    padding:18px 16px;
+    margin-bottom:14px;
+    box-shadow:0 2px 10px rgba(15,54,82,0.08);
+    border:1px solid #DCE3E8;
+  }
+  .panel h2{
+    font-size:17px;
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .panel .tag{
+    font-family:'Space Mono',monospace;
+    font-size:10px;
+    letter-spacing:1.5px;
+    color:var(--accent-brass-dark);
+    text-transform:uppercase;
+    font-weight:700;
+    margin-bottom:2px;
+  }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    border-radius:var(--radius);
+    padding:16px;
+    margin:12px 0;
+    background-image:
+      linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  /* ===== Buttons ===== */
+  .btn{
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    font-weight:700;
+    border:none;
+    border-radius:10px;
+    padding:11px 16px;
+    cursor:pointer;
+    background:var(--accent-brass);
+    color:#2A1B0C;
+    transition: transform .08s ease;
+    touch-action:manipulation;
+    -webkit-user-select:none;
+    min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{
+    background:transparent;
+    border:2px solid var(--accent-brass);
+    color:var(--accent-brass-dark);
+  }
+  .btn.success{ background:var(--success); color:#fff; }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  /* ===== Rivet grid (Stage 1) ===== */
+  .rivetgrid{
+    display:grid;
+    gap:5px;
+    justify-content:center;
+    margin:14px 0;
+    min-height:60px;
+  }
+  .rivet{
+    width:16px;height:16px;
+    border-radius:50%;
+    background:var(--line-blueprint);
+    border:1.5px solid #fff;
+  }
+  .rivet.leftover{ background:var(--alert); }
+  .resultmsg{
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    text-align:center;
+    padding:8px;
+    border-radius:8px;
+    margin-top:8px;
+  }
+  .resultmsg.fit{ background:rgba(76,154,139,0.18); color:var(--success-dark); }
+  .resultmsg.nofit{ background:rgba(224,164,88,0.18); color:var(--alert-dark); }
+
+  .numpicker{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+  .numpicker button{
+    width:44px;height:44px;
+    border-radius:8px;
+    border:2px solid var(--bg-paper-alt);
+    background:#fff;
+    font-family:'Space Mono',monospace;
+    font-weight:700;
+    cursor:pointer;
+    color:var(--text-ink);
+    -webkit-user-select:none;
+    touch-action:manipulation;
+  }
+  .numpicker button.selected{ border-color:var(--accent-brass); background:var(--accent-brass-light); }
+
+  .factorlist{
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    text-align:center;
+    padding:10px;
+    color:var(--text-on-blueprint);
+  }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  /* ===== Sieve grid (Stage 2) ===== */
+  .sievegrid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:5px;
+    margin:12px 0;
+  }
+  .cell{
+    aspect-ratio:1;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:7px;
+    font-family:'Space Mono',monospace;
+    font-size:11.5px;
+    font-weight:700;
+    background:rgba(191,227,240,0.15);
+    color:var(--text-on-blueprint);
+    border:1.5px solid rgba(191,227,240,0.3);
+    transition: all .25s;
+  }
+  .cell.flooded{ background:rgba(224,164,88,0.25); color:rgba(234,246,251,0.4); border-color:transparent; text-decoration:line-through; }
+  .cell.prime{ background:var(--accent-brass); color:#2A1B0C; border-color:var(--accent-brass-light); transform:scale(1.05); }
+  .cell.start{ background:rgba(255,255,255,0.12); }
+  .stripgrid{ display:grid; grid-template-columns:repeat(11,1fr); gap:5px; }
+  .stripgrid .cell{ font-size:11px; }
+
+  /* ===== Rule card (Stage 3) ===== */
+  .rulecard{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    border-radius:var(--radius);
+    padding:20px 16px;
+    text-align:center;
+    border:2px dashed var(--accent-brass);
+  }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:16px; font-weight:700; line-height:1.6; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:30px; }
+
+  /* ===== FAQ (Stage 4) ===== */
+  .faq{
+    background:var(--bg-paper);
+    border-left:4px solid var(--accent-brass);
+    border-radius:0 10px 10px 0;
+    padding:10px 12px;
+    margin:10px 0;
+  }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .row13-12{ display:flex; gap:10px; margin:10px 0; flex-wrap:wrap; }
+  .attemptcard{ flex:1; min-width:140px; background:var(--bg-blueprint); border-radius:10px; padding:10px; text-align:center; }
+  .attemptcard .lbl{ font-family:'Space Mono',monospace; color:var(--text-on-blueprint); font-size:12px; margin-bottom:6px; }
+  .attemptline{ font-family:'Space Mono',monospace; font-size:11px; color:var(--line-blueprint); margin:2px 0; }
+  .attemptline.no{ color:var(--alert); }
+  .attemptline.yes{ color:var(--success); }
+
+  /* ===== Boss log (Stage 5) ===== */
+  .caselog{
+    background:#fff;
+    border:2px solid var(--bg-paper-alt);
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:12px;
+  }
+  .caselog .num{
+    display:inline-block;
+    background:var(--accent-brass);
+    color:#2A1B0C;
+    font-family:'Space Mono',monospace;
+    font-weight:700;
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:6px;
+    margin-bottom:6px;
+  }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{
+    background:var(--bg-paper);
+    border-radius:8px;
+    padding:8px 10px;
+    margin:6px 0;
+    font-size:13px;
+    border-left:3px solid var(--success);
+  }
+  .bonusbox{
+    border:2px dashed var(--accent-brass);
+    border-radius:12px;
+    padding:14px;
+    background:rgba(184,131,77,0.06);
+  }
+  .bonusbox .badge{
+    font-family:'Space Mono',monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    color:var(--accent-brass-dark);
+    font-weight:700;
+  }
+
+  /* ===== Nav footer ===== */
+  .navfoot{
+    position:fixed; bottom:0; left:0; right:0;
+    background:#fff;
+    border-top:2px solid var(--bg-paper-alt);
+    padding:10px 14px;
+    display:flex; gap:10px;
+    max-width:720px; margin:0 auto;
+  }
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px;
+    background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px;
+    font-family:'Space Mono',monospace; font-size:11.5px;
+    color:var(--text-ink-soft); cursor:pointer;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{
+    background:var(--accent-brass-light);
+    border-radius:10px;
+    padding:9px 12px;
+    font-size:12.5px;
+    color:#5C3E1B;
+    margin:10px 0;
+    font-weight:600;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Hull Engineering Division</div>
+  <h1>⚓ Module 2: Prime Numbers</h1>
+  <div class="sub">Watertight Compartments — which sections can't be split?</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — LAY ONE RIVET AND SEE WHAT HAPPENS</div>
+
+<div class="stagebar" id="stagebar"></div>
+
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+const STAGE_KEYS = ['visual','strategy','rule','why','boss'];
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+// Safe storage wrapper — falls back to in-memory if localStorage is blocked
+// (this can happen on file:// origins, e.g. opening the file directly via AirDrop,
+// or in Safari Private Browsing). App still works fully in a session either way.
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{
+    const raw = localStorage.getItem('nts_m2_titanic');
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    storageBlocked = true;
+    return memoryFallback;
+  }
+}
+function saveState(obj){
+  try{
+    localStorage.setItem('nts_m2_titanic', JSON.stringify(obj));
+  }catch(e){
+    storageBlocked = true;
+    memoryFallback = obj;
+  }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_number: 12,
+  s1_tried: [],
+  s2_floodIndex: 0,
+  s2_flooded: {},
+  s2_confirmed: {},
+  s2_revealedRemaining: false,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_KEYS.map((k,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>
+      ${STAGE_LABELS[i]}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= STAGE 1: VISUAL MODEL ================= */
+function factorsOf(n){
+  const f=[]; for(let i=1;i<=n;i++) if(n%i===0) f.push(i); return f;
+}
+function renderStage1(){
+  const n = state.s1_number;
+  const facts = factorsOf(n);
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — Testing the Hull</div>
+    <h2>How many ways can ${n} rivets sit in equal rows?</h2>
+    <p>Every compartment is built from steel rivets. Pick a rivet count below, then test whether it can be arranged into <b>equal rows</b> of more than one row. That's it — that's Step 1.</p>
+    <div class="numpicker">
+      ${[7,8,9,10,11,12,13,14,15].map(num=>`<button class="${num===n?'selected':''}" onclick="pickNumber(${num})">${num}</button>`).join('')}
+    </div>
+    <div class="blueprint-box">
+      <div class="factorlist">RIVETS TO TEST: <b>${n}</b></div>
+      <div class="btnrow" style="justify-content:center">
+        ${[2,3,4,5,6].filter(d=>d<n).map(d=>`<button class="btn ghost" style="color:var(--text-on-blueprint);border-color:var(--accent-brass-light)" onclick="tryDivisor(${d})">Try ${d} rows</button>`).join('')}
+      </div>
+      <div id="gridArea"></div>
+      <div class="factorlist" style="margin-top:6px">Factors found so far: <b>${facts.join(', ')}</b></div>
+    </div>
+    <div class="step1banner">💡 Engineer's note: if the ONLY way to arrange a number is 1 row of everything, it's a <b>PRIME hull section</b> — it can't be subdivided. Test a few more numbers above and watch what happens.</div>
+  </div>`;
+}
+function pickNumber(n){ state.s1_number = n; state.s1_tried = []; save(); render(); }
+function tryDivisor(d){
+  const n = state.s1_number;
+  const fits = n % d === 0;
+  const area = document.getElementById('gridArea');
+  if(fits){
+    const rows = n/d;
+    area.innerHTML = `<div class="rivetgrid" style="grid-template-columns:repeat(${d},16px)">${Array(n).fill('<div class="rivet"></div>').join('')}</div>
+    <div class="resultmsg fit">✅ IT FITS! ${rows} rows of ${d} — this is a COMPOSITE section, it can be split.</div>`;
+  } else {
+    const rows = Math.floor(n/d);
+    const used = rows*d;
+    const leftover = n-used;
+    area.innerHTML = `<div class="rivetgrid" style="grid-template-columns:repeat(${d},16px)">
+      ${Array(used).fill('<div class="rivet"></div>').join('')}${Array(leftover).fill('<div class="rivet leftover"></div>').join('')}
+    </div>
+    <div class="resultmsg nofit">⚠️ Doesn't stack evenly — ${leftover} rivet(s) stick out. ${d} rows doesn't work for ${n}.</div>`;
+  }
+}
+
+/* ================= STAGE 2: MENTAL STRATEGY (SIEVE) ================= */
+const SIEVE_MAX = 50;
+const FLOOD_SEQUENCE = [2,3,5,7];
+function renderStage2(){
+  const cells = [];
+  for(let i=2;i<=SIEVE_MAX;i++){
+    let cls='cell';
+    if(state.s2_confirmed[i]) cls+=' prime';
+    else if(state.s2_flooded[i]) cls+=' flooded';
+    cells.push(`<div class="${cls}">${i}</div>`);
+  }
+  const doneFlooding = state.s2_floodIndex >= FLOOD_SEQUENCE.length;
+  const nextNum = FLOOD_SEQUENCE[state.s2_floodIndex];
+  const primeCount = Object.keys(state.s2_confirmed).length;
+
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — Flood Test the Hull Chart</div>
+    <h2>Find every unsinkable section from 2 to 50</h2>
+    <p>Engineers "flood test" a compartment by checking every multiple. If a number floods, it means a smaller section fits inside it evenly — so it's not prime. One flood test at a time. That's the whole strategy.</p>
+    <div class="blueprint-box">
+      <div class="sievegrid">${cells.join('')}</div>
+    </div>
+    <div class="btnrow" style="justify-content:center">
+      ${!doneFlooding
+        ? `<button class="btn big" onclick="floodTest()">🌊 Flood Test with ${nextNum}</button>`
+        : (!state.s2_revealedRemaining
+            ? `<button class="btn big success" onclick="revealRemaining()">✅ Reveal remaining prime sections</button>`
+            : `<div class="step1banner">🏁 Sieve complete! ${primeCount} prime compartments found between 2 and 50.</div>`)
+      }
+    </div>
+    <div class="step1banner">💡 Notice: once you've flood-tested 2, 3, 5, and 7 — every OTHER number left untouched is automatically prime. You don't have to test every number by hand.</div>
+  </div>`;
+}
+function floodTest(){
+  const d = FLOOD_SEQUENCE[state.s2_floodIndex];
+  if(!state.s2_flooded[d]) state.s2_confirmed[d] = true;
+  for(let m=d*2; m<=SIEVE_MAX; m+=d){
+    if(!state.s2_confirmed[m]) state.s2_flooded[m] = true;
+  }
+  state.s2_floodIndex++;
+  save(); render();
+}
+function revealRemaining(){
+  for(let i=2;i<=SIEVE_MAX;i++){
+    if(!state.s2_flooded[i]) state.s2_confirmed[i] = true;
+  }
+  state.s2_revealedRemaining = true;
+  save(); render();
+}
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Engineer's Definition</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big">A <span class="n">PRIME</span> hull section has<br>exactly <span class="n">TWO</span> factors:<br>1 and itself.</div>
+    </div>
+    <p style="margin-top:14px">A <b>composite</b> section has three or more factors — it can always be split into smaller equal rows.</p>
+    <table class="divtable">
+      <tr><td>÷2</td><td>Last digit is even (0,2,4,6,8)</td></tr>
+      <tr><td>÷3</td><td>Digit sum divides by 3</td></tr>
+      <tr><td>÷5</td><td>Ends in 0 or 5</td></tr>
+      <tr><td>÷10</td><td>Ends in 0</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: think of 1 as a single rivet with no seam to split — it doesn't count as prime OR composite. It's the "keel" every hull is built from.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — The Proof</div>
+    <h2>13 rivets vs. 12 rivets</h2>
+    <p>Watch what happens when we try EVERY possible number of rows on two different hull sections:</p>
+    <div class="row13-12">
+      <div class="attemptcard">
+        <div class="lbl">13 RIVETS</div>
+        <div class="attemptline no">2 rows → ✗ leftover</div>
+        <div class="attemptline no">3 rows → ✗ leftover</div>
+        <div class="attemptline no">4 rows → ✗ leftover</div>
+        <div class="attemptline no">5 rows → ✗ leftover</div>
+        <div class="attemptline no">6 rows → ✗ leftover</div>
+        <div class="attemptline yes">13 rows → ✓ (just itself)</div>
+      </div>
+      <div class="attemptcard">
+        <div class="lbl">12 RIVETS</div>
+        <div class="attemptline yes">2 rows → ✓ fits!</div>
+        <div class="attemptline yes">3 rows → ✓ fits!</div>
+        <div class="attemptline yes">4 rows → ✓ fits!</div>
+        <div class="attemptline yes">6 rows → ✓ fits!</div>
+        <div class="attemptline no">5 rows → ✗ leftover</div>
+      </div>
+    </div>
+    <p><b>Here's the proof, engineer-style:</b> if a number COULD be arranged into rows a and columns b (both bigger than 1), then a and b are both factors — so by definition it can't be prime. 13 refused every arrangement except 1×13, so no hidden factors exist. That's not luck. That's the rule holding.</p>
+    <div class="faq">
+      <div class="q">Why isn't 1 prime?</div>
+      <div class="a">A prime needs exactly TWO factors. 1 only has ONE factor (itself). Not enough to qualify.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Why is 2 the only even prime?</div>
+      <div class="a">Every other even number can always split into 2 equal rows — that's a free extra factor, which makes it composite. 2 is too small for that split to count as "more than itself."</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='strip'){
+    let cells='';
+    for(let i=v.range[0]; i<=v.range[1]; i++){
+      let cls='cell';
+      if(v.primes && v.primes.includes(i)) cls+=' prime';
+      else if(v.flooded.includes(i)) cls+=' flooded';
+      cells+=`<div class="${cls}">${i}</div>`;
+    }
+    return `<div class="blueprint-box"><div class="stripgrid">${cells}</div></div>`;
+  }
+  if(v.type==='grid'){
+    const total=v.total, cols=v.cols;
+    const rows=Math.floor(total/cols);
+    const used=rows*cols;
+    const leftover=total-used;
+    const dots = Array(used).fill('<div class="rivet"></div>').join('') + Array(leftover).fill('<div class="rivet leftover"></div>').join('');
+    const fits = leftover===0;
+    return `<div class="blueprint-box">
+      <div class="rivetgrid" style="grid-template-columns:repeat(${cols},16px)">${dots}</div>
+      <div class="resultmsg ${fits?'fit':'nofit'}">${fits ? `✅ ${cols} rows of ${rows} — fits perfectly!` : `⚠️ ${cols} rows leaves ${leftover} left over.`}</div>
+    </div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: 'The Compartment Order',
+    text: 'The shipbuilders need compartments sized 20–30 rivets that CANNOT split into equal rows. Find every prime size in that range.',
+    steps: [
+      { text:'Step 1: Lay out every whole number from 20 to 30 on the hull chart.',
+        visual:{type:'strip', range:[20,30], flooded:[]} },
+      { text:'Step 2: Flood every even number — they always split into 2 rows, so they can\u2019t be prime.',
+        visual:{type:'strip', range:[20,30], flooded:[20,22,24,26,28,30]} },
+      { text:'Step 3: For what\u2019s left, flood test \u00f73 and \u00f75 using the rules from Stage 3.',
+        visual:{type:'strip', range:[20,30], flooded:[20,21,22,24,25,26,27,28,30]} },
+      { text:'Answer: 23 and 29 survived every flood test \u2014 no arrangement except 1 row works for either.',
+        visual:{type:'strip', range:[20,30], flooded:[20,21,22,24,25,26,27,28,30], primes:[23,29]} }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Stubborn Solution',
+    text: 'Dr. J.J. has 17 drops of stabilizer and wants to pour it into 2 or more test tubes with an equal amount in each. Possible?',
+    steps: [
+      { text:'Step 1: Lay out all 17 drops in a single row \u2014 that\u2019s the 1\u00d717 arrangement, which always works.',
+        visual:{type:'grid', total:17, cols:17} },
+      { text:'Step 2: Try splitting into 2 test tubes (2 rows).',
+        visual:{type:'grid', total:17, cols:2} },
+      { text:'Step 3: Try 3 test tubes (3 rows) too \u2014 same problem shows up.',
+        visual:{type:'grid', total:17, cols:3} },
+      { text:'Answer: No \u2014 every row count from 2 to 16 leaves drops left over. 17 only has factors 1 and 17, so it\u2019s prime.',
+        visual:{type:'grid', total:17, cols:4} }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Coin Blocks",
+    text: 'Mario has 24 coin blocks and wants equal rows (more than 1 row) to fit through a pipe. List every way. Then try 23 \u2014 why does he get stuck?',
+    steps: [
+      { text:'Step 1: Try 2 rows of Mario\u2019s 24 blocks.',
+        visual:{type:'grid', total:24, cols:2} },
+      { text:'Step 2: Try 3 rows too \u2014 another clean fit!',
+        visual:{type:'grid', total:24, cols:3} },
+      { text:'Step 3: 24 also works with 4, 6, 8, and 12 rows. Now try Mario\u2019s NEXT pipe: 23 blocks, 2 rows.',
+        visual:{type:'grid', total:23, cols:2} },
+      { text:'Answer: 24 splits six different ways \u2014 but 23 refuses every row count except 1\u00d723. Mario needs a different pipe size!',
+        visual:{type:'grid', total:23, cols:3} }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${renderVisual(data.steps[i].visual)}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: Look at your Stage 2 hull chart. Find pairs of primes exactly 2 apart, like 3 and 5.",
+  "Step 2: Scan the chart in order: 3&5, 5&7, 11&13, 17&19, 29&31, 41&43...",
+  "That's 6 twin-prime pairs between 2 and 50! Engineers call these 'twin bulkheads' — two unsinkable sections standing right next to each other."
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one in your head or on paper FIRST. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>Twin Bulkheads Hunt:</b> Find prime pairs exactly 2 apart on your Stage 2 chart (like 3 and 5).</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Prime Numbers.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>

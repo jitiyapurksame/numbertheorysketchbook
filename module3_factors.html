@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Factors">
+<title>Module 3: Factors — Cargo Container Manifest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.success{ background:var(--success); color:#fff; }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .rivetgrid{ display:grid; gap:5px; justify-content:center; margin:14px 0; min-height:60px; }
+  .rivet{ width:16px;height:16px; border-radius:50%; background:var(--line-blueprint); border:1.5px solid #fff; }
+  .rivet.leftover{ background:var(--alert); }
+  .resultmsg{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:8px; border-radius:8px; margin-top:8px; }
+  .resultmsg.fit{ background:rgba(76,154,139,0.18); color:var(--success-dark); }
+  .resultmsg.nofit{ background:rgba(224,164,88,0.18); color:var(--alert-dark); }
+
+  .numpicker{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+  .numpicker button{
+    width:44px;height:44px; border-radius:8px; border:2px solid var(--bg-paper-alt); background:#fff;
+    font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; color:var(--text-ink);
+    -webkit-user-select:none; touch-action:manipulation;
+  }
+  .numpicker button.selected{ border-color:var(--accent-brass); background:var(--accent-brass-light); }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  /* Rainbow pair rows (Stage 2) */
+  .rainbowlist{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+  .pairrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--accent-brass);
+  }
+  .pairrow.single{ border-left-color:var(--success); }
+  .pairrow .arc{ color:var(--accent-brass-light); font-size:16px; }
+  .pairrow.tested-no{ opacity:0.4; border-left-color:transparent; }
+  .midbanner{
+    text-align:center; font-family:'Space Mono',monospace; font-size:12px; color:var(--accent-brass-light);
+    padding:8px; border-top:1px dashed var(--line-blueprint-dim); margin-top:6px;
+  }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:15.5px; font-weight:700; line-height:1.65; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:56px; }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .stripgrid{ display:grid; grid-template-columns:repeat(11,1fr); gap:5px; }
+  .stripgrid .cell{ font-size:11px; }
+  .cell{
+    aspect-ratio:1; display:flex;align-items:center;justify-content:center; border-radius:7px;
+    font-family:'Space Mono',monospace; font-size:11.5px; font-weight:700;
+    background:rgba(191,227,240,0.15); color:var(--text-on-blueprint); border:1.5px solid rgba(191,227,240,0.3);
+  }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Cargo Engineering Division</div>
+  <h1>📦 Module 3: Factors</h1>
+  <div class="sub">Cargo Container Manifest — every way to load the hold</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — TEST ONE DIVISOR, SEE WHAT LOADS</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('nts_m3_factors'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('nts_m3_factors', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_number: 24,
+  s2_number: 36,
+  s2_testIndex: 1,
+  s2_pairs: [],
+  s2_reachedMiddle: false,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= STAGE 1: VISUAL MODEL ================= */
+function renderStage1(){
+  const n = state.s1_number;
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — Loading the Cargo Hold</div>
+    <h2>Every way to load ${n} crates in equal rows</h2>
+    <p>A factor pair is any two numbers that multiply to make your cargo count. Pick a crate count, then test a row size — when it fits, you've found a pair. Test one divisor. That's Step 1.</p>
+    <div class="numpicker">
+      ${[16,18,20,24,28,30,32,40].map(num=>`<button class="${num===n?'selected':''}" onclick="pickNumber(${num})">${num}</button>`).join('')}
+    </div>
+    <div class="blueprint-box">
+      <div class="factorlist">CRATES TO LOAD: <b>${n}</b></div>
+      <div class="btnrow" style="justify-content:center">
+        ${[2,3,4,5,6,8].filter(d=>d<n).map(d=>`<button class="btn ghost" style="color:var(--text-on-blueprint);border-color:var(--accent-brass-light)" onclick="tryDivisor(${d})">Try ${d} rows</button>`).join('')}
+      </div>
+      <div id="gridArea"></div>
+    </div>
+    <div class="step1banner">💡 Engineer's note: when a row size fits, you get a factor pair for FREE — the row size AND the number of rows are both factors. Try a few above, then head to Stage 2 for the shortcut that finds them all.</div>
+  </div>`;
+}
+function pickNumber(n){ state.s1_number = n; save(); render(); }
+function tryDivisor(d){
+  const n = state.s1_number;
+  const fits = n % d === 0;
+  const area = document.getElementById('gridArea');
+  if(fits){
+    const rows = n/d;
+    area.innerHTML = `<div class="rivetgrid" style="grid-template-columns:repeat(${d},16px)">${Array(n).fill('<div class="rivet"></div>').join('')}</div>
+    <div class="resultmsg fit">✅ ${rows} rows of ${d} — factor pair found: <b>${d} & ${rows}</b></div>`;
+  } else {
+    const rows = Math.floor(n/d);
+    const used = rows*d;
+    const leftover = n-used;
+    area.innerHTML = `<div class="rivetgrid" style="grid-template-columns:repeat(${d},16px)">
+      ${Array(used).fill('<div class="rivet"></div>').join('')}${Array(leftover).fill('<div class="rivet leftover"></div>').join('')}
+    </div>
+    <div class="resultmsg nofit">⚠️ ${leftover} crate(s) left over — ${d} isn't a factor of ${n}.</div>`;
+  }
+}
+
+/* ================= STAGE 2: MENTAL STRATEGY (SQRT SHORTCUT) ================= */
+function renderStage2(){
+  const n = state.s2_number;
+  const sqrtN = Math.sqrt(n);
+  const maxTest = Math.floor(sqrtN);
+  const done = state.s2_testIndex > maxTest;
+
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — The Rainbow Shortcut</div>
+    <h2>Find every factor of ${n} — the fast way</h2>
+    <p>You don't need to test all the way up to ${n}. Once your test number passes the square root of ${n} (about ${sqrtN.toFixed(1)}), every pair just repeats in reverse. Test one number at a time and watch the rainbow build.</p>
+    <div class="blueprint-box">
+      <div class="rainbowlist">${state.s2_pairs.map(p=>`
+        <div class="pairrow ${p.single?'single':''}">
+          <span>${p.d}</span><span class="arc">${p.single ? '◆ perfect square' : '↔'}</span><span>${p.other}</span>
+        </div>`).join('') || '<div style="text-align:center;color:var(--line-blueprint-dim);font-family:Space Mono,monospace;font-size:12px">No pairs tested yet — tap below to test divisor 1</div>'}
+      </div>
+      <div class="btnrow" style="justify-content:center">
+        ${!done
+          ? `<button class="btn big" onclick="testNextDivisor()">🔎 Test divisor ${state.s2_testIndex} on ${n}</button>`
+          : `<div class="step1banner">🏁 Reached the middle of the rainbow at ${maxTest} — testing further would only repeat pairs you already found!</div>`}
+      </div>
+    </div>
+    <div class="step1banner">💡 Notice: the moment your test number gets close to ~${sqrtN.toFixed(1)}, the two sides of each pair get close together too. That's your signal you're almost done.</div>
+  </div>`;
+}
+function testNextDivisor(){
+  const n = state.s2_number;
+  const d = state.s2_testIndex;
+  if(n % d === 0){
+    const other = n/d;
+    state.s2_pairs.push({d:d, other:other, single: d===other});
+  }
+  state.s2_testIndex++;
+  save(); render();
+}
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function computeFactors(n){
+  const f=[]; for(let i=1;i<=n;i++) if(n%i===0) f.push(i); return f;
+}
+function renderFactorRainbowSVG(n){
+  const factors = computeFactors(n);
+  const count = factors.length;
+  const spacing = 62;
+  const padX = 40;
+  const width = padX*2 + spacing*(count-1);
+  const baseline = 150;
+  const height = 190;
+  const sqrtN = Math.sqrt(n);
+  const isPerfectSquare = Number.isInteger(sqrtN);
+
+  const pairs = [];
+  let lo=0, hi=count-1;
+  while(lo<hi){ pairs.push([lo,hi]); lo++; hi--; }
+  const singleIndex = lo===hi ? lo : null;
+
+  let arcsSvg = '';
+  pairs.forEach((pair,i)=>{
+    const [a,b] = pair;
+    const x1 = padX + a*spacing;
+    const x2 = padX + b*spacing;
+    const rx = (x2-x1)/2;
+    const ry = rx*0.55;
+    arcsSvg += `<path d="M ${x1} ${baseline} A ${rx} ${ry} 0 0 1 ${x2} ${baseline}" fill="none" stroke="var(--accent-brass-light)" stroke-width="2.5" opacity="${(0.95 - i*0.08).toFixed(2)}"/>`;
+  });
+
+  let dotsSvg = '';
+  factors.forEach((f,i)=>{
+    const x = padX + i*spacing;
+    const isKeel = singleIndex===i;
+    dotsSvg += `
+      <circle cx="${x}" cy="${baseline}" r="${isKeel?9:7}" fill="${isKeel?'var(--success)':'var(--accent-brass)'}" stroke="#fff" stroke-width="2"/>
+      <text x="${x}" y="${baseline+22}" text-anchor="middle" font-family="Space Mono, monospace" font-size="12" fill="var(--text-on-blueprint)" font-weight="700">${f}</text>`;
+  });
+
+  let keelSvg = '';
+  if(isPerfectSquare){
+    const x = padX + singleIndex*spacing;
+    keelSvg = `<line x1="${x}" y1="18" x2="${x}" y2="${baseline}" stroke="var(--success)" stroke-dasharray="4,4" stroke-width="2"/>
+    <text x="${x}" y="12" text-anchor="middle" font-family="Space Mono, monospace" font-size="11" fill="var(--success)" font-weight="700">\u221A${n} = ${sqrtN}</text>`;
+  }
+
+  return `<svg viewBox="0 0 ${width} ${height}" style="width:100%;height:auto;display:block">${arcsSvg}${dotsSvg}${keelSvg}</svg>`;
+}
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Engineer's Method</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big">Test divisors <span class="n">1, 2, 3...</span><br>only up to the <span class="n">SQUARE ROOT</span>.<br>Each hit gives <span class="n">TWO</span> factors<br>(or one, if it's a perfect square).</div>
+    </div>
+    <div class="blueprint-box">
+      ${renderFactorRainbowSVG(36)}
+    </div>
+    <p style="text-align:center;font-size:13px;color:var(--text-ink-soft);margin-top:-6px">Notice the arcs get shorter the closer they get to the keel line at 6 — that's the square root at work. 6 pairs with itself, so it doesn't need an arc at all.</p>
+    <table class="divtable">
+      <tr><td>√25 = 5</td><td>Test divisors 1 to 5 only</td></tr>
+      <tr><td>√36 = 6</td><td>Test divisors 1 to 6 only</td></tr>
+      <tr><td>√49 = 7</td><td>Test divisors 1 to 7 only</td></tr>
+      <tr><td>√60 ≈ 7.7</td><td>Test divisors 1 to 7 only (round down)</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: think of the square root as the "keel line" of your rainbow — the point where the two ends of every arc meet in the middle.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — The Proof</div>
+    <h2>Why stop at the square root?</h2>
+    <p>Look back at your Stage 2 rainbow for 36. Every pair has one factor <b>below</b> 6 and one factor <b>above</b> 6 — except 6 itself, which pairs with itself.</p>
+    <div class="blueprint-box">
+      <div class="rainbowlist">
+        <div class="pairrow"><span>1</span><span class="arc">↔</span><span>36</span></div>
+        <div class="pairrow"><span>2</span><span class="arc">↔</span><span>18</span></div>
+        <div class="pairrow"><span>3</span><span class="arc">↔</span><span>12</span></div>
+        <div class="pairrow"><span>4</span><span class="arc">↔</span><span>9</span></div>
+        <div class="pairrow single"><span>6</span><span class="arc">◆ perfect square</span><span>6</span></div>
+      </div>
+      <div class="midbanner">Everything past 6 (like 9, 12, 18, 36) is just a partner you've already met.</div>
+    </div>
+    <p><b>Here's the proof, engineer-style:</b> if a divisor d is bigger than √N, then N/d must be SMALLER than √N (because their product is fixed at N). That means the smaller partner would already have been caught when you tested numbers below the square root. There's no new factor waiting past that point — only repeats, flipped around.</p>
+    <div class="faq">
+      <div class="q">What if the square root isn't a whole number?</div>
+      <div class="a">Round down. For 60 (√60 ≈ 7.7), test up to 7 — 8 and above would only give you partners smaller than 7, which you'd have already found.</div>
+    </div>
+    <div class="faq">
+      <div class="q">What makes a perfect square special?</div>
+      <div class="a">Its square root pairs with itself, so it only counts once instead of twice — that's why perfect squares always have an odd number of total factors.</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='pairs'){
+    return `<div class="blueprint-box"><div class="rainbowlist">${v.pairs.map(p=>`
+      <div class="pairrow ${p.single?'single':''}"><span>${p.d}</span><span class="arc">${p.single?'◆':'↔'}</span><span>${p.other}</span></div>`).join('')}</div></div>`;
+  }
+  if(v.type==='grid'){
+    const total=v.total, cols=v.cols;
+    const rows=Math.floor(total/cols);
+    const used=rows*cols;
+    const leftover=total-used;
+    const dots = Array(used).fill('<div class="rivet"></div>').join('') + Array(leftover).fill('<div class="rivet leftover"></div>').join('');
+    const fits = leftover===0;
+    return `<div class="blueprint-box">
+      <div class="rivetgrid" style="grid-template-columns:repeat(${cols},16px)">${dots}</div>
+      <div class="resultmsg ${fits?'fit':'nofit'}">${fits ? `✅ ${cols} rows of ${rows} — factor pair ${cols} & ${rows}!` : `⚠️ ${cols} rows leaves ${leftover} left over — not a factor.`}</div>
+    </div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: 'The Cargo Hold Manifest',
+    text: 'The hold carries 48 crates. Find EVERY way to arrange them into equal rows (all factor pairs of 48).',
+    steps: [
+      { text:'Step 1: The square root of 48 is about 6.9, so we only need to test divisors 1 to 6.',
+        visual:{type:'grid', total:48, cols:1} },
+      { text:'Step 2: Test 2, 3, and 4 — each one fits perfectly.',
+        visual:{type:'pairs', pairs:[{d:2,other:24},{d:3,other:16},{d:4,other:12}]} },
+      { text:'Step 3: 5 leaves crates over (skip it) — but 6 fits.',
+        visual:{type:'grid', total:48, cols:6} },
+      { text:'Answer: five factor pairs in total.',
+        visual:{type:'pairs', pairs:[{d:1,other:48},{d:2,other:24},{d:3,other:16},{d:4,other:12},{d:6,other:8}]} }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Test Tube Rack',
+    text: 'A chemist has 36 test tubes and wants a rectangular rack (rows × columns, more than 1 row). List every rack size.',
+    steps: [
+      { text:'Step 1: √36 = 6 exactly — a clean number! Test divisors 1 to 6.',
+        visual:{type:'grid', total:36, cols:1} },
+      { text:'Step 2: 2, 3, and 4 all fit evenly.',
+        visual:{type:'pairs', pairs:[{d:2,other:18},{d:3,other:12},{d:4,other:9}]} },
+      { text:'Step 3: 5 leaves tubes over — skip it. 6 fits, but it pairs with itself (6×6).',
+        visual:{type:'grid', total:36, cols:6} },
+      { text:'Answer: because 36 is a perfect square, it has an ODD number of factors — 9 in total, with 6×6 as the one that doesn\u2019t repeat.',
+        visual:{type:'pairs', pairs:[{d:1,other:36},{d:2,other:18},{d:3,other:12},{d:4,other:9},{d:6,other:6,single:true}]} }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Block Pyramid",
+    text: 'Mario has 60 coin blocks and wants to try every rectangular arrangement before choosing one for his puzzle.',
+    steps: [
+      { text:'Step 1: √60 ≈ 7.7, so test divisors 1 to 7.',
+        visual:{type:'grid', total:60, cols:1} },
+      { text:'Step 2: 2, 3, 4, and 5 all fit with no blocks left over.',
+        visual:{type:'pairs', pairs:[{d:2,other:30},{d:3,other:20},{d:4,other:15},{d:5,other:12}]} },
+      { text:'Step 3: 6 fits too — but 7 leaves blocks over, so we stop there.',
+        visual:{type:'grid', total:60, cols:7} },
+      { text:'Answer: six factor pairs — twelve total factors for Mario to choose from.',
+        visual:{type:'pairs', pairs:[{d:1,other:60},{d:2,other:30},{d:3,other:20},{d:4,other:15},{d:5,other:12},{d:6,other:10}]} }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${renderVisual(data.steps[i].visual)}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: √24 ≈ 4.9, so only test divisors 1 to 4.",
+  "Step 2: 1, 2, 3, and 4 all fit — no perfect square here, so every pair is a true pair.",
+  "Answer: 1↔24, 2↔12, 3↔8, 4↔6 — eight factors total, and the rainbow has no single middle arc since 24 isn\u2019t a perfect square."
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>Rainbow Draw:</b> Find every factor pair of 24 using the square-root shortcut.</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Factors.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>

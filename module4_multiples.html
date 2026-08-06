@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Multiples">
+<title>Module 4: Multiples — Convoy Bell Schedule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.blueline{ background:transparent; border:2px solid var(--line-blueprint); color:var(--line-blueprint); }
+  .btn.success{ background:var(--success); color:#fff; }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .rivetgrid{ display:grid; gap:5px; justify-content:center; margin:14px 0; min-height:60px; }
+  .rivet{ width:16px;height:16px; border-radius:50%; background:var(--line-blueprint); border:1.5px solid #fff; }
+  .rivet.leftover{ background:var(--alert); }
+  .resultmsg{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:8px; border-radius:8px; margin-top:8px; }
+  .resultmsg.fit{ background:rgba(76,154,139,0.18); color:var(--success-dark); }
+  .resultmsg.nofit{ background:rgba(224,164,88,0.18); color:var(--alert-dark); }
+
+  .numpicker{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+  .numpicker button{
+    width:44px;height:44px; border-radius:8px; border:2px solid var(--bg-paper-alt); background:#fff;
+    font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; color:var(--text-ink);
+    -webkit-user-select:none; touch-action:manipulation;
+  }
+  .numpicker button.selected{ border-color:var(--accent-brass); background:var(--accent-brass-light); }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  .rainbowlist{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+  .pairrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--accent-brass);
+  }
+  .pairrow.single{ border-left-color:var(--success); }
+  .pairrow .arc{ color:var(--accent-brass-light); font-size:16px; }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:15.5px; font-weight:700; line-height:1.65; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:70px; }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .multgrid{ display:grid; grid-template-columns:repeat(10,1fr); gap:5px; }
+  .cell{
+    aspect-ratio:1; display:flex;align-items:center;justify-content:center; border-radius:7px;
+    font-family:'Space Mono',monospace; font-size:11.5px; font-weight:700;
+    background:rgba(191,227,240,0.15); color:var(--text-on-blueprint); border:1.5px solid rgba(191,227,240,0.3);
+    transition: all .25s;
+  }
+  .cell.markA{ background:var(--accent-brass); color:#2A1B0C; border-color:var(--accent-brass-light); }
+  .cell.markB{ background:var(--line-blueprint-dim); color:#0A2740; border-color:var(--line-blueprint); }
+  .cell.markBoth{ background:var(--success); color:#fff; border-color:#fff; transform:scale(1.08); }
+  .legend{ display:flex; gap:14px; justify-content:center; margin-top:8px; font-family:'Space Mono',monospace; font-size:11px; color:var(--text-on-blueprint); flex-wrap:wrap; }
+  .legend .swatch{ display:inline-block; width:10px;height:10px;border-radius:3px;margin-right:4px; vertical-align:middle; }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Signals &amp; Timing Division</div>
+  <h1>🔔 Module 4: Multiples</h1>
+  <div class="sub">Convoy Bell Schedule — when do the bells ring together?</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — RING ONE BELL, WATCH THE PATTERN</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('nts_m4_multiples'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('nts_m4_multiples', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_d: 4,
+  s1_marked: 0,
+  s2_a: 4,
+  s2_b: 6,
+  s2_aCount: 0,
+  s2_bCount: 0,
+  s2_found: false,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= STAGE 1: VISUAL MODEL ================= */
+const GRID_MAX = 30;
+function renderStage1(){
+  const d = state.s1_d;
+  const marked = state.s1_marked;
+  const currentMultiples = [];
+  for(let i=1;i<=marked;i++) currentMultiples.push(d*i);
+  let cells = '';
+  for(let i=1;i<=GRID_MAX;i++){
+    const cls = currentMultiples.includes(i) ? 'cell markA' : 'cell';
+    cells += `<div class="${cls}">${i}</div>`;
+  }
+  const nextVal = d*(marked+1);
+  const canMark = nextVal <= GRID_MAX;
+
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — Setting the Bell Interval</div>
+    <h2>Mark every mile the bell rings</h2>
+    <p>The engine bell rings every ${d} miles along the voyage. Tap "Ring next bell" to mark the mile it rings on — one bell at a time. That's Step 1.</p>
+    <div class="numpicker">
+      ${[2,3,4,5,6].map(num=>`<button class="${num===d?'selected':''}" onclick="pickInterval(${num})">${num}</button>`).join('')}
+    </div>
+    <div class="blueprint-box">
+      <div class="multgrid">${cells}</div>
+      <div class="legend"><span><span class="swatch" style="background:var(--accent-brass)"></span>rings on this mile</span></div>
+    </div>
+    <div class="btnrow" style="justify-content:center">
+      ${canMark
+        ? `<button class="btn big" onclick="markNext()">🔔 Ring next bell (mile ${nextVal})</button>`
+        : `<div class="step1banner">🏁 All bells marked up to mile ${GRID_MAX}! Notice they land in a perfectly even pattern — that's what a multiple is: any mile you land on by counting in steps of ${d}.</div>`}
+    </div>
+  </div>`;
+}
+function pickInterval(d){ state.s1_d = d; state.s1_marked = 0; save(); render(); }
+function markNext(){ state.s1_marked++; save(); render(); }
+
+/* ================= STAGE 2: MENTAL STRATEGY (LCM) ================= */
+function renderStage2(){
+  const a = state.s2_a, b = state.s2_b;
+  const aMultiples = [];
+  for(let i=1;i<=state.s2_aCount;i++) aMultiples.push(a*i);
+  const bMultiples = [];
+  for(let i=1;i<=state.s2_bCount;i++) bMultiples.push(b*i);
+
+  let cells = '';
+  let matchValue = null;
+  for(let i=1;i<=GRID_MAX;i++){
+    const inA = aMultiples.includes(i);
+    const inB = bMultiples.includes(i);
+    let cls = 'cell';
+    if(inA && inB){ cls += ' markBoth'; if(matchValue===null) matchValue=i; }
+    else if(inA) cls += ' markA';
+    else if(inB) cls += ' markB';
+    cells += `<div class="${cls}">${i}</div>`;
+  }
+  if(matchValue !== null && !state.s2_found){ state.s2_found = true; save(); }
+
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — Two Bells, One Meeting Point</div>
+    <h2>The engine bell rings every ${a} miles. The escort ship's bell rings every ${b} miles. When do they ring together?</h2>
+    <p>Ring each bell one step at a time and watch the chart. The first mile marked by BOTH bells is their common ringing point.</p>
+    <div class="blueprint-box">
+      <div class="multgrid">${cells}</div>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--accent-brass)"></span>engine bell (×${a})</span>
+        <span><span class="swatch" style="background:var(--line-blueprint-dim)"></span>escort bell (×${b})</span>
+        <span><span class="swatch" style="background:var(--success)"></span>both together!</span>
+      </div>
+    </div>
+    <div class="btnrow" style="justify-content:center">
+      <button class="btn ghost" ${state.s2_found?'disabled':''} onclick="ringA()">🔔 Ring engine bell (next: ${a*(state.s2_aCount+1)})</button>
+      <button class="btn blueline" ${state.s2_found?'disabled':''} onclick="ringB()">🔔 Ring escort bell (next: ${b*(state.s2_bCount+1)})</button>
+    </div>
+    ${state.s2_found ? `<div class="step1banner">🏁 Both bells rang together at mile ${matchValue}! Engineers call this the Least Common Multiple (LCM) of ${a} and ${b}.</div>` : ''}
+  </div>`;
+}
+function ringA(){ if(state.s2_a*(state.s2_aCount+1) <= GRID_MAX) state.s2_aCount++; save(); render(); }
+function ringB(){ if(state.s2_b*(state.s2_bCount+1) <= GRID_MAX) state.s2_bCount++; save(); render(); }
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Engineer's Method</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big">List multiples of the <span class="n">LARGER</span> number.<br>Stop at the first one that's<br>also a multiple of the <span class="n">SMALLER</span> number.<br>That's the <span class="n">LCM</span>.</div>
+    </div>
+    <table class="divtable">
+      <tr><td>4 & 6</td><td>4,8,<b>12</b>... → 12 is also a multiple of 4. LCM = 12</td></tr>
+      <tr><td>5 & 8</td><td>8,16,24,32,<b>40</b>... LCM = 40</td></tr>
+      <tr><td>3 & 6</td><td>6 is already a multiple of 3. LCM = 6</td></tr>
+      <tr><td>6 & 9</td><td>9,<b>18</b>... LCM = 18</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: always start your list from the BIGGER number — you'll find the meeting point in fewer steps than starting from the smaller one.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — The Proof</div>
+    <h2>Why start from the bigger number?</h2>
+    <p>Look back at your Stage 2 chart for 4 and 6. Here's every multiple side by side:</p>
+    <div class="blueprint-box">
+      <div class="rainbowlist">
+        <div class="pairrow"><span>×4:</span><span class="arc"></span><span>4, 8, 12, 16, 20, 24</span></div>
+        <div class="pairrow single"><span>×6:</span><span class="arc"></span><span>6, 12, 18, 24</span></div>
+      </div>
+    </div>
+    <p><b>Here's the proof, engineer-style:</b> the LCM has to appear in BOTH lists — so it must be a multiple of 6 already. That means you only need to check 6, 12, 18, 24... (4 numbers) instead of checking every multiple of 4 one at a time (6 numbers to reach the same point). Starting from the bigger number skips the checks that could never work anyway.</p>
+    <div class="faq">
+      <div class="q">What if one number is already a multiple of the other?</div>
+      <div class="a">Then the LCM is just the bigger number itself — like 3 and 6, where 6 is already a multiple of 3. No searching needed.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Is the LCM always a×b?</div>
+      <div class="a">Only when the numbers share no common factors (like 4 and 9, LCM = 36). If they share a factor, like 4 and 6 sharing a 2, the LCM is smaller than a×b.</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='list'){
+    return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`
+      <div class="pairrow ${r.hit?'single':''}"><span>${r.label}</span><span class="arc"></span><span>${r.values}</span></div>`).join('')}</div></div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: "The Ship's Bell Puzzle",
+    text: "The Titanic's engine bell rings every 4 minutes and the escort ship's bell rings every 6 minutes. Both rang together at 8:00pm. When do they next ring together?",
+    steps: [
+      { text:'Step 1: Start with the bigger number — list multiples of 6.',
+        visual:{type:'list', rows:[{label:'×6:', values:'6, 12, 18...'}]} },
+      { text:'Step 2: Check each one against multiples of 4.',
+        visual:{type:'list', rows:[{label:'×4:', values:'4, 8, 12, 16...'}]} },
+      { text:'Step 3: 12 shows up in both lists!',
+        visual:{type:'list', rows:[{label:'×6:', values:'6, 12'},{label:'×4:', values:'4, 8, 12', hit:true}]} },
+      { text:'Answer: LCM(4,6) = 12 minutes → the bells next ring together at 8:12pm.' }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Dosing Schedule',
+    text: 'A chemist adds Solution A every 5 minutes and Solution B every 8 minutes, starting together at minute 0. When will she add both at the same moment again?',
+    steps: [
+      { text:'Step 1: Start with the bigger number — list multiples of 8.',
+        visual:{type:'list', rows:[{label:'×8:', values:'8, 16, 24, 32, 40...'}]} },
+      { text:'Step 2: Check each against multiples of 5.',
+        visual:{type:'list', rows:[{label:'×5:', values:'5, 10, 15, 20, 25, 30, 35, 40...'}]} },
+      { text:'Step 3: None of 8, 16, 24, or 32 appear in the ×5 list — keep going.',
+        visual:{type:'list', rows:[{label:'×8:', values:'8, 16, 24, 32'}]} },
+      { text:'Answer: LCM(5,8) = 40. Since 5 and 8 share no common factor, the LCM is simply 5×8 = 40 minutes.' }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Coin & Mushroom Blocks",
+    text: 'Mario collects a coin every 3 blocks and a mushroom every 4 blocks, starting at block 0. At which block does he get both at once?',
+    steps: [
+      { text:'Step 1: Start with the bigger number — list multiples of 4.',
+        visual:{type:'list', rows:[{label:'×4:', values:'4, 8, 12...'}]} },
+      { text:'Step 2: Check each against multiples of 3.',
+        visual:{type:'list', rows:[{label:'×3:', values:'3, 6, 9, 12...'}]} },
+      { text:'Step 3: 12 lands in both lists.',
+        visual:{type:'list', rows:[{label:'×4:', values:'4, 8, 12'},{label:'×3:', values:'3, 6, 9, 12', hit:true}]} },
+      { text:'Answer: LCM(3,4) = 12 → Mario gets both the coin and mushroom at block 12.' }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${data.steps[i].visual ? renderVisual(data.steps[i].visual) : ''}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: Start with the bigger number — list multiples of 12: 12, 24, 36...",
+  "Step 2: Check each against multiples of 9: 9, 18, 27, 36...",
+  "Answer: LCM(9,12) = 36 — the two schedules first line up after 36 miles."
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>Third Convoy Ship:</b> Find the LCM of 9 and 12.</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Multiples.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>
