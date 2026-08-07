@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Divisibility">
+<title>Module 5: Divisibility — Rapid Cargo Inspection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .numpicker{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+  .numpicker button{
+    min-width:52px; height:44px; padding:0 10px; border-radius:8px; border:2px solid var(--bg-paper-alt); background:#fff;
+    font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; color:var(--text-ink);
+    -webkit-user-select:none; touch-action:manipulation;
+  }
+  .numpicker button.selected{ border-color:var(--accent-brass); background:var(--accent-brass-light); }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  .numstrip{ display:flex; justify-content:center; gap:6px; margin:14px 0; flex-wrap:wrap; }
+  .digitchip{
+    width:38px;height:44px;border-radius:8px;background:rgba(191,227,240,0.15);
+    border:1.5px solid rgba(191,227,240,0.3); display:flex;align-items:center;justify-content:center;
+    font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:var(--text-on-blueprint);
+    transition: all .2s;
+  }
+  .digitchip.highlight{ background:var(--accent-brass); color:#2A1B0C; border-color:var(--accent-brass-light); transform:scale(1.08); }
+  .digitchip.dim{ opacity:0.35; }
+
+  .checkgrid{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
+  .checkresult{ background:rgba(255,255,255,0.08); border-radius:10px; padding:10px 14px; text-align:center; font-family:'Space Mono',monospace; min-width:70px; }
+  .checkresult .clabel{ font-size:11px; color:var(--accent-brass-light); }
+  .checkresult .verdict{ font-size:16px; font-weight:700; margin-top:4px; }
+  .checkresult.yes .verdict{ color:var(--success); }
+  .checkresult.no .verdict{ color:var(--alert); }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:15.5px; font-weight:700; line-height:1.65; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:40px; }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Harbor Inspection Division</div>
+  <h1>🔍 Module 5: Divisibility</h1>
+  <div class="sub">Rapid Cargo Inspection — no long division needed</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — CHECK ONE CLUE, TRUST THE RULE</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('nts_m5_divisibility'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('nts_m5_divisibility', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_number: 428,
+  s1_checked: false,
+  s2_number: 432,
+  s2_addedCount: 0,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= STAGE 1: VISUAL MODEL (LAST DIGIT) ================= */
+function renderStage1(){
+  const n = state.s1_number;
+  const digits = String(n).split('');
+  const last = Number(digits[digits.length-1]);
+  const chips = digits.map((d,i)=>`<div class="digitchip ${i===digits.length-1?'highlight':''}">${d}</div>`).join('');
+
+  let checksHtml = '';
+  if(state.s1_checked){
+    const by2 = last % 2 === 0;
+    const by5 = last === 0 || last === 5;
+    const by10 = last === 0;
+    checksHtml = `<div class="checkgrid">
+      <div class="checkresult ${by2?'yes':'no'}"><div class="clabel">÷2</div><div class="verdict">${by2?'✓ YES':'✗ NO'}</div></div>
+      <div class="checkresult ${by5?'yes':'no'}"><div class="clabel">÷5</div><div class="verdict">${by5?'✓ YES':'✗ NO'}</div></div>
+      <div class="checkresult ${by10?'yes':'no'}"><div class="clabel">÷10</div><div class="verdict">${by10?'✓ YES':'✗ NO'}</div></div>
+    </div>`;
+  }
+
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — The Last-Digit Trick</div>
+    <h2>Just look at the LAST digit of ${n}</h2>
+    <p>An inspector doesn't have time for long division on every cargo count. Pick a number, look only at its last digit, and you can instantly tell if it splits evenly by 2, 5, or 10.</p>
+    <div class="numpicker">
+      ${[428,135,560,273,940,802].map(num=>`<button class="${num===n?'selected':''}" onclick="pickNumber1(${num})">${num}</button>`).join('')}
+    </div>
+    <div class="blueprint-box">
+      <div class="numstrip">${chips}</div>
+      ${!state.s1_checked
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="runCheck1()">🔎 Run Quick Check</button></div>`
+        : checksHtml}
+    </div>
+    ${state.s1_checked ? `<div class="step1banner">💡 Notice: you never looked at the other digits at all! For ÷2, ÷5, and ÷10, the last digit is the ONLY thing that matters.</div>` : ''}
+  </div>`;
+}
+function pickNumber1(n){ state.s1_number = n; state.s1_checked = false; save(); render(); }
+function runCheck1(){ state.s1_checked = true; save(); render(); }
+
+/* ================= STAGE 2: MENTAL STRATEGY (DIGIT SUM) ================= */
+function renderStage2(){
+  const n = state.s2_number;
+  const digits = String(n).split('').map(Number);
+  const added = state.s2_addedCount;
+  const chips = digits.map((d,i)=>`<div class="digitchip ${i<added?'highlight':'dim'}">${d}</div>`).join('');
+  const runningSum = digits.slice(0,added).reduce((a,b)=>a+b,0);
+  const done = added >= digits.length;
+
+  let checksHtml = '';
+  if(done){
+    const by3 = runningSum % 3 === 0;
+    const by9 = runningSum % 9 === 0;
+    checksHtml = `<div class="checkgrid">
+      <div class="checkresult ${by3?'yes':'no'}"><div class="clabel">÷3</div><div class="verdict">${by3?'✓ YES':'✗ NO'}</div></div>
+      <div class="checkresult ${by9?'yes':'no'}"><div class="clabel">÷9</div><div class="verdict">${by9?'✓ YES':'✗ NO'}</div></div>
+    </div>`;
+  }
+
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — The Digit-Sum Shortcut</div>
+    <h2>Add up the digits of ${n}</h2>
+    <p>For ÷3 and ÷9, there's a different shortcut: add every digit together. Add one digit at a time — that's Step 1 — and watch the running total.</p>
+    <div class="numpicker">
+      ${[432,501,288,145,675,144].map(num=>`<button class="${num===n?'selected':''}" onclick="pickNumber2(${num})">${num}</button>`).join('')}
+    </div>
+    <div class="blueprint-box">
+      <div class="numstrip">${chips}</div>
+      <div class="factorlist">Running total: <b>${runningSum}</b></div>
+      ${!done
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="addDigit()">➕ Add next digit (${digits[added]})</button></div>`
+        : checksHtml}
+    </div>
+    ${done ? `<div class="step1banner">💡 The digit sum of ${n} is ${runningSum} — and that small number tells you everything about ÷3 and ÷9, without ever dividing ${n} itself.</div>` : ''}
+  </div>`;
+}
+function pickNumber2(n){ state.s2_number = n; state.s2_addedCount = 0; save(); render(); }
+function addDigit(){ state.s2_addedCount++; save(); render(); }
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Inspector's Checklist</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big">Small clues replace<br>long division:<br>a <span class="n">DIGIT</span>, a <span class="n">PAIR</span>,<br>or a <span class="n">SUM</span>.</div>
+    </div>
+    <table class="divtable">
+      <tr><td>÷2</td><td>Last digit is even (0,2,4,6,8)</td></tr>
+      <tr><td>÷3</td><td>Digit sum divides evenly by 3</td></tr>
+      <tr><td>÷4</td><td>Last TWO digits divide evenly by 4</td></tr>
+      <tr><td>÷5</td><td>Last digit is 0 or 5</td></tr>
+      <tr><td>÷6</td><td>Passes BOTH the ÷2 and ÷3 checks</td></tr>
+      <tr><td>÷8</td><td>Last THREE digits divide evenly by 8</td></tr>
+      <tr><td>÷9</td><td>Digit sum divides evenly by 9</td></tr>
+      <tr><td>÷10</td><td>Last digit is 0</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: 2, 5, 10 → check the LAST digit. 3, 9 → check the SUM. 4, 8 → check the last FEW digits together.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — The Proof</div>
+    <h2>Why does only the last digit matter for ÷2, ÷5, ÷10?</h2>
+    <p>Take 428. Split it by place value: <b>428 = 400 + 20 + 8</b>. Both 400 and 20 are already multiples of 10 (and therefore multiples of 2 and 5) — they never affect the remainder. Only the 8 decides the answer.</p>
+    <h2 style="margin-top:16px">Why does the digit-sum trick work for ÷9?</h2>
+    <p>Take 432. Expand it: <b>432 = 400 + 30 + 2 = (399+1) + (27+3) + 2</b>. Notice 399 and 27 are BOTH exact multiples of 9 — they vanish from the remainder. All that's left is <b>1 + 3 + 2</b>, which is just the digit sum!</p>
+    <div class="blueprint-box">
+      <div class="factorlist">Every place value is "one more than a multiple of 9" — <b>10 = 9+1, 100 = 99+1, 1000 = 999+1</b> — so only the digits themselves carry the remainder forward.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Does the same trick work for ÷3?</div>
+      <div class="a">Yes — 3 divides into 9 evenly, so anything that works for 9's "hidden groups" also works for 3's. That's why ÷3 and ÷9 share the same digit-sum trick.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Why last TWO digits for ÷4, not just one?</div>
+      <div class="a">Because 100 is a multiple of 4 (100 = 4×25), so every place value from the hundreds up disappears from the remainder — only the last two digits (the "tens and ones" chunk) carry it.</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='digits'){
+    const digits = String(v.number).split('').map(Number);
+    const sum = digits.reduce((a,b)=>a+b,0);
+    return `<div class="blueprint-box">
+      <div class="numstrip">${digits.map(d=>`<div class="digitchip highlight">${d}</div>`).join('')}</div>
+      <div class="factorlist">Digit sum = <b>${sum}</b></div>
+    </div>`;
+  }
+  if(v.type==='lasttwo'){
+    const s = String(v.number);
+    const lastTwo = s.slice(-2);
+    const rest = s.slice(0,-2);
+    return `<div class="blueprint-box">
+      <div class="numstrip">
+        ${rest.split('').map(d=>`<div class="digitchip">${d}</div>`).join('')}${lastTwo.split('').map(d=>`<div class="digitchip highlight">${d}</div>`).join('')}
+      </div>
+      <div class="factorlist">Last two digits = <b>${lastTwo}</b> → ${parseInt(lastTwo,10)} ÷ 4 = ${parseInt(lastTwo,10)/4}</div>
+    </div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: 'The Nine-Section Check',
+    text: 'Three cargo counts need inspecting fast: 432, 275, and 918 crates. Which can split evenly into 9 hold sections?',
+    steps: [
+      { text:'Step 1: Find the digit sum of 432.', visual:{type:'digits', number:432} },
+      { text:'Step 2: 9 divides evenly into that sum — 432 PASSES. Now check 275.', visual:{type:'digits', number:275} },
+      { text:'Step 3: 14 does NOT divide evenly by 9 — 275 FAILS. Now check 918.', visual:{type:'digits', number:918} },
+      { text:'Answer: 432 and 918 split evenly into 9 sections. 275 cannot — 14 isn\u2019t a multiple of 9.' }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Beaker Split',
+    text: 'A chemist mixed 1,236 mL of solution. Can she pour it into exactly 4 equal beakers with none left over?',
+    steps: [
+      { text:'Step 1: Ignore everything except the last two digits of 1,236.', visual:{type:'lasttwo', number:1236} },
+      { text:'Step 2: 36 \u00f7 4 = 9 exactly \u2014 no remainder.' },
+      { text:'Step 3: Since the last two digits divide evenly by 4, the WHOLE number does too \u2014 that\u2019s the shortcut at work.' },
+      { text:'Answer: Yes \u2014 1,236 mL splits evenly into 4 beakers of 309 mL each.' }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Coin Split",
+    text: 'Mario collected 4,563 coins across the level. Can he split them evenly among 3 friends? What about 9 friends?',
+    steps: [
+      { text:'Step 1: Find the digit sum of 4,563.', visual:{type:'digits', number:4563} },
+      { text:'Step 2: 18 divides evenly by BOTH 3 and 9.' },
+      { text:'Step 3: That means 4,563 passes both checks at once \u2014 a double win.' },
+      { text:'Answer: Mario can split evenly among 3 friends (1,521 coins each) OR 9 friends (507 coins each).' }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${data.steps[i].visual ? renderVisual(data.steps[i].visual) : ''}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: For the ÷11 trick, label 2,728's digits by position from the right: 8 (1st), 2 (2nd), 7 (3rd), 2 (4th).",
+  "Step 2: Add the odd positions, subtract the even positions: 8 \u2212 2 + 7 \u2212 2.",
+  "Answer: = 11, which is divisible by 11 \u2014 so 2,728 is too! (2,728 \u00f7 11 = 248, exactly.)"
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>The Eleven-Rule:</b> a competition-level trick. Is 2,728 divisible by 11?</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Divisibility.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>
