@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Numbers">
+<title>Module 1: Numbers — Ship's Manifest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .numpicker{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+  .numpicker button{
+    min-width:52px; height:44px; padding:0 10px; border-radius:8px; border:2px solid var(--bg-paper-alt); background:#fff;
+    font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; color:var(--text-ink); font-size:13px;
+    -webkit-user-select:none; touch-action:manipulation;
+  }
+  .numpicker button.selected{ border-color:var(--accent-brass); background:var(--accent-brass-light); }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  /* Nested cargo holds */
+  .nestbox{ border:2px solid var(--accent-brass); border-radius:14px; padding:14px; margin:6px; position:relative; }
+  .nestlabel{
+    position:absolute; top:-11px; left:14px; background:var(--bg-blueprint); padding:0 8px;
+    font-family:'Space Mono',monospace; font-size:11px; font-weight:700; color:var(--accent-brass-light);
+  }
+  .layerexamples{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:6px; }
+  .chip{
+    background:rgba(255,255,255,0.1); border:1.5px solid var(--line-blueprint-dim); border-radius:20px;
+    padding:4px 10px; font-family:'Space Mono',monospace; font-size:12px; color:var(--text-on-blueprint);
+  }
+  .chip.new{ background:var(--accent-brass); border-color:var(--accent-brass-light); color:#2A1B0C; font-weight:700; }
+
+  .rainbowlist{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+  .pairrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--accent-brass);
+  }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:14.5px; font-weight:700; line-height:1.7; text-align:left; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:90px; }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Cargo Manifest Division</div>
+  <h1>📋 Module 1: Numbers</h1>
+  <div class="sub">Ship's Manifest — sorting every kind of cargo</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — OPEN ONE HOLD AT A TIME</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const LAYERS = [
+  { name:'Natural', examples:['1','7','42'], desc:'Counting whole crates — the basic numbers you count with, starting at 1.' },
+  { name:'Whole', examples:['0'], desc:'Add zero — even an EMPTY hold has a count worth recording.' },
+  { name:'Integers', examples:['-5','-12'], desc:'Add negatives — ballast levels can sit below the waterline reference line.' },
+  { name:'Rational', examples:['1/2','0.75','-3/4'], desc:'Add fractions and decimals — any measured amount you can write as one whole number over another.' },
+  { name:'Real (incl. Irrational)', examples:['\u221A2','\u03C0'], desc:'Add the numbers that never resolve to a clean fraction, no matter how precisely you measure — like a true diagonal brace length.' }
+];
+
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('nts_m1_numbers'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('nts_m1_numbers', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_layer: 0,
+  s2_item: 0,
+  s2_reveal: 0,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= STAGE 1: VISUAL MODEL (NESTED HOLDS) ================= */
+function buildNested(idx){
+  let html = `<div class="layerexamples">${LAYERS[0].examples.map(e=>`<span class="chip ${idx===0?'new':''}">${e}</span>`).join('')}</div>`;
+  html = `<div class="nestbox"><div class="nestlabel">${LAYERS[0].name}</div>${html}</div>`;
+  for(let i=1;i<=idx;i++){
+    const isNewest = i===idx;
+    const chips = LAYERS[i].examples.map(e=>`<span class="chip ${isNewest?'new':''}">${e}</span>`).join('');
+    html = `<div class="nestbox"><div class="nestlabel">${LAYERS[i].name}</div>${html}<div class="layerexamples">${chips}</div></div>`;
+  }
+  return html;
+}
+function renderStage1(){
+  const idx = state.s1_layer;
+  const done = idx >= LAYERS.length-1;
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — Opening the Cargo Holds</div>
+    <h2>Every number category sits inside a bigger one</h2>
+    <p>Start with the innermost hold and open one bigger hold at a time. Everything from the inner holds stays included — you're never removing cargo, only adding more kinds.</p>
+    <div class="blueprint-box">
+      ${buildNested(idx)}
+      <div class="factorlist" style="margin-top:10px">${LAYERS[idx].desc}</div>
+      ${!done
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="openNext1()">📦 Open the next hold: ${LAYERS[idx+1].name}</button></div>`
+        : `<div class="step1banner">🏁 All holds open! Notice: every Natural number is also Whole, Integer, Rational, AND Real — the categories nest inside each other, they never separate.</div>`}
+    </div>
+  </div>`;
+}
+function openNext1(){ if(state.s1_layer < LAYERS.length-1) state.s1_layer++; save(); render(); }
+
+/* ================= STAGE 2: MENTAL STRATEGY (SORTING FAST) ================= */
+const SORT_ITEMS = [
+  { label:'-4', steps:[
+      'Is it a positive counting number? No \u2014 it\u2019s negative.',
+      'Is it zero? No.',
+      'Is it a negative whole number? Yes \u2014 that makes it an Integer.'
+    ], answer:'-4 is an Integer (also Rational and Real, but Integer is its smallest home).' },
+  { label:'0', steps:[
+      'Is it a natural counting number (1,2,3...)? No \u2014 counting starts at 1, and 0 means "none counted."',
+      'Is it a whole number (0,1,2,3...)? Yes!'
+    ], answer:'0 is Whole (also Integer, Rational, Real \u2014 but Whole is its smallest home).' },
+  { label:'0.75', steps:[
+      'Is it a whole number? No \u2014 it has a fractional part.',
+      'Can it be written as one whole number over another? Yes: 0.75 = 3/4.'
+    ], answer:'0.75 is Rational (also Real, but not Integer/Whole/Natural).' },
+  { label:'7', steps:[
+      'Is it a positive counting number, with no fraction and not zero? Yes!'
+    ], answer:'7 is Natural \u2014 the smallest, most basic category. (Also Whole, Integer, Rational, Real.)' },
+  { label:'\u221A2', steps:[
+      'Is it a whole number? No \u2014 1<sup>2</sup>=1 and 2<sup>2</sup>=4, so \u221A2 sits between 1 and 2.',
+      'Can it be written as one whole number over another? No \u2014 this has been mathematically PROVEN impossible. Its decimal (1.41421356...) never ends and never repeats.'
+    ], answer:'\u221A2 is Irrational \u2014 part of the Real numbers, but never a clean fraction.' },
+  { label:'2.5', steps:[
+      'Is it a whole number? No \u2014 it has a fractional part (.5).',
+      'Can it be written as one whole number over another? Yes: 2.5 = 5/2.'
+    ], answer:'2.5 is Rational (also Real).' }
+];
+function renderStage2(){
+  const item = SORT_ITEMS[state.s2_item];
+  const r = state.s2_reveal;
+  const done = r >= item.steps.length;
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — Sorting Cargo Fast</div>
+    <h2>Find the SMALLEST hold that fits: ${item.label}</h2>
+    <p>You don't have to check everything — ask one question at a time, starting from the smallest, most basic category (Natural) and working outward.</p>
+    <div class="numpicker">
+      ${SORT_ITEMS.map((it,i)=>`<button class="${i===state.s2_item?'selected':''}" onclick="pickItem2(${i})">${it.label}</button>`).join('')}
+    </div>
+    <div class="blueprint-box">
+      <div class="rainbowlist">${Array.from({length:r}).map((_,i)=>`<div class="pairrow">${item.steps[i]}</div>`).join('')}</div>
+      <div class="btnrow" style="justify-content:center">
+        ${!done
+          ? `<button class="btn big" onclick="revealS2()">🔓 Show me the next question</button>`
+          : `<div class="step1banner">🏁 ${item.answer}</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+function pickItem2(i){ state.s2_item = i; state.s2_reveal = 0; save(); render(); }
+function revealS2(){ state.s2_reveal++; save(); render(); }
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Engineer's Method</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big">Every Natural is Whole.<br>Every Whole is an Integer.<br>Every Integer is Rational.<br>Every Rational is Real.<br><span class="n">Irrational fills in the rest of Real.</span></div>
+    </div>
+    <table class="divtable">
+      <tr><td>Natural</td><td>1, 2, 3, 4... (counting, starts at 1)</td></tr>
+      <tr><td>Whole</td><td>0, 1, 2, 3... (adds zero)</td></tr>
+      <tr><td>Integers</td><td>...,-2,-1,0,1,2... (adds negatives)</td></tr>
+      <tr><td>Rational</td><td>any fraction of two integers (0.75, -3/4, 5)</td></tr>
+      <tr><td>Irrational</td><td>never repeats/terminates (&radic;2, &pi;)</td></tr>
+      <tr><td>Real</td><td>Rational + Irrational together</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: you can always move OUTWARD through the holds (a Natural number is automatically Real too), but never inward automatically — not every Real number is Natural.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — The Proof</div>
+    <h2>Why is every Integer automatically Rational?</h2>
+    <p>Any whole number n can always be written as a fraction: <b>n = n/1</b>. Since that's "one integer over another," it fits the definition of Rational perfectly.</p>
+    <div class="blueprint-box">
+      <div class="factorlist">-5 = -5/1 &nbsp;&nbsp; 7 = 7/1 &nbsp;&nbsp; 0 = 0/1<br>Every single Integer converts this way — no exceptions.</div>
+    </div>
+    <p><b>Here's why &radic;2 breaks the pattern:</b> mathematicians have proven — rigorously, not just by trying really hard — that NO fraction of two integers can ever equal exactly &radic;2. You can get closer and closer (1.4, 1.41, 1.414, 1.4142...) but the decimal never settles into a repeating pattern or stops. That's exactly what makes a number Irrational.</p>
+    <div class="faq">
+      <div class="q">Is 0 a Natural number?</div>
+      <div class="a">Mathematicians actually disagree on this one! Some number systems include 0 as Natural; this Sketchbook follows the Cambridge/Singapore convention where Natural numbers start at 1, and 0 is the smallest Whole number instead. Either way, 0 is always at least Whole, Integer, Rational, and Real.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Can a decimal be Rational even if it doesn't terminate?</div>
+      <div class="a">Yes — as long as it REPEATS forever in a pattern (like 0.333333... = 1/3), it's still Rational. Only decimals that never terminate AND never repeat are Irrational.</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='list'){
+    return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`<div class="pairrow">${r}</div>`).join('')}</div></div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: 'The Hold Readings',
+    text: 'The engine room logged three readings: -12 (ballast level), 0 (an empty hold), and 45 (crates counted). Classify each into its smallest category.',
+    steps: [
+      { text:'Step 1: -12 is negative and whole \u2014 not Natural, not Whole, but fits Integer.', visual:{type:'list', rows:['-12 &rarr; Integer']} },
+      { text:'Step 2: 0 means "nothing counted" \u2014 not Natural (which starts at 1), but exactly Whole.', visual:{type:'list', rows:['0 &rarr; Whole']} },
+      { text:'Step 3: 45 is a positive counting number with nothing unusual about it.', visual:{type:'list', rows:['45 &rarr; Natural']} },
+      { text:'Answer: -12 is an Integer, 0 is Whole, and 45 is Natural \u2014 three different smallest homes, even though all three are also Real.' }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Lab Measurements',
+    text: 'A chemist measures 3.5 mL of solution, then measures a flask\u2019s circumference-to-diameter ratio, which is always &pi; &asymp; 3.14159265...',
+    steps: [
+      { text:'Step 1: 3.5 has a fractional part, but can be written as a fraction.', visual:{type:'list', rows:['3.5 = 7/2 &rarr; Rational']} },
+      { text:'Step 2: &pi;\u2019s decimal never ends and never repeats \u2014 mathematically proven, just like &radic;2.', visual:{type:'list', rows:['&pi; &rarr; Irrational']} },
+      { text:'Answer: 3.5 mL is Rational. The circumference ratio &pi; is Irrational \u2014 no matter how precisely you measure any circle, that ratio never resolves to a clean fraction.' }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Numbers",
+    text: 'Mario\u2019s score is 1500. His diagonal jump across a 1&times;1 block forms a length of exactly &radic;2. Classify both.',
+    steps: [
+      { text:'Step 1: 1500 is a plain positive counting number.', visual:{type:'list', rows:['1500 &rarr; Natural']} },
+      { text:'Step 2: &radic;2 sits between 1 and 2, and can never be written as a fraction.', visual:{type:'list', rows:['&radic;2 &rarr; Irrational']} },
+      { text:'Answer: 1500 is Natural. The diagonal &radic;2 is Irrational \u2014 the exact same number that shows up in real engineering diagonal braces.' }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${data.steps[i].visual ? renderVisual(data.steps[i].visual) : ''}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: Some famous \u2018interesting\u2019 numbers: 1 (the only number that\u2019s neither prime nor composite), 0 (the only number that\u2019s neither positive nor negative).",
+  "Step 2: \u221A2 was one of the FIRST numbers ever proven irrational \u2014 by ancient Greek mathematicians, over 2,000 years ago.",
+  "Answer: Number classification isn\u2019t just sorting \u2014 some of these categories took centuries of careful proof to fully understand. You just retraced reasoning that once genuinely surprised the world\u2019s best mathematicians."
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>Interesting Number Classifications:</b> a few numbers that break expectations.</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Numbers.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>

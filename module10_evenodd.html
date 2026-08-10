@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Even & Odd">
+<title>Module 10: Even & Odd — Lifeboat Pairing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .numpicker{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+  .numpicker button{
+    min-width:52px; height:44px; padding:0 10px; border-radius:8px; border:2px solid var(--bg-paper-alt); background:#fff;
+    font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; color:var(--text-ink);
+    -webkit-user-select:none; touch-action:manipulation;
+  }
+  .numpicker button.selected{ border-color:var(--accent-brass); background:var(--accent-brass-light); }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  .boatrow{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:14px 0; }
+  .boat{
+    background:rgba(255,255,255,0.1); border:2px solid var(--accent-brass); border-radius:20px;
+    padding:6px 12px; font-size:18px; display:flex; gap:4px; align-items:center;
+  }
+  .boat.leftover{ border-color:var(--alert); background:rgba(224,164,88,0.15); }
+
+  .resultmsg{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; border-radius:8px; }
+  .resultmsg.fit{ background:rgba(76,154,139,0.18); color:var(--success); }
+  .resultmsg.nofit{ background:rgba(224,164,88,0.2); color:var(--alert); }
+
+  .runningtotal{ text-align:center; font-family:'Space Mono',monospace; font-size:15px; font-weight:700; color:var(--text-on-blueprint); margin:8px 0 4px; }
+  .runningtotal .lbl{ display:block; font-size:11px; color:var(--accent-brass-light); font-weight:400; }
+
+  .rainbowlist{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+  .pairrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--accent-brass);
+  }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:15.5px; font-weight:700; line-height:1.65; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:110px; }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Lifeboat Muster Division</div>
+  <h1>🛟 Module 10: Even & Odd</h1>
+  <div class="sub">Lifeboat Pairing — proving parity without counting everything</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — FORM ONE PAIR AT A TIME</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('nts_m10_evenodd'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('nts_m10_evenodd', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_n: 11,
+  s1_pairsFormed: 0,
+  s2_scenario: 0,
+  s2_revealed: false,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= HELPERS ================= */
+function renderBoats(pairsFormed, leftover){
+  let html = `<div class="boatrow">`;
+  for(let i=0;i<pairsFormed;i++){
+    html += `<div class="boat">🧑🧑</div>`;
+  }
+  if(leftover){
+    html += `<div class="boat leftover">🧑</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+/* ================= STAGE 1: VISUAL MODEL (PAIRING) ================= */
+function renderStage1(){
+  const n = state.s1_n;
+  const pairsFormed = state.s1_pairsFormed;
+  const remaining = n - pairsFormed*2;
+  const done = remaining <= 1;
+  const finalLeftover = done && remaining === 1;
+
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — Filling the Lifeboats</div>
+    <h2>Pair up ${n} crew members, 2 per lifeboat</h2>
+    <p>Form one lifeboat pair at a time. If everyone pairs up with none left standing, the crew count is EVEN. If exactly one person is left alone, it's ODD.</p>
+    <div class="numpicker">
+      ${[6,7,10,11,14,15].map(num=>`<button class="${num===n?'selected':''}" onclick="pickN1(${num})">${num}</button>`).join('')}
+    </div>
+    <div class="blueprint-box">
+      ${renderBoats(pairsFormed, done && finalLeftover)}
+      <div class="runningtotal"><span class="lbl">CREW REMAINING ON DECK</span>${remaining}</div>
+      ${!done
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="formPair1()">🛟 Form next lifeboat pair</button></div>`
+        : `<div class="step1banner">🏁 ${n} is ${finalLeftover?'ODD':'EVEN'} — ${finalLeftover?'one crew member is left standing alone.':'everyone paired up perfectly, nobody left over.'}</div>`}
+    </div>
+  </div>`;
+}
+function pickN1(n){ state.s1_n = n; state.s1_pairsFormed = 0; save(); render(); }
+function formPair1(){ state.s1_pairsFormed++; save(); render(); }
+
+/* ================= STAGE 2: MENTAL STRATEGY (COMBINING CREWS) ================= */
+const SCENARIOS = [[7,5],[8,5],[8,6]];
+function renderStage2(){
+  const [a,b] = SCENARIOS[state.s2_scenario];
+  const aLeftover = a % 2;
+  const bLeftover = b % 2;
+  const combined = a + b;
+  const combinedLeftover = combined % 2;
+
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — Combining Two Crews</div>
+    <h2>Crew A has ${a}. Crew B has ${b}. What happens when they combine?</h2>
+    <p>You already know each crew's own leftover. Predict what happens when they join lifeboats together — BEFORE adding them up.</p>
+    <div class="numpicker">
+      ${SCENARIOS.map((s,i)=>`<button class="${i===state.s2_scenario?'selected':''}" onclick="pickScenario(${i})">${s[0]} & ${s[1]}</button>`).join('')}
+    </div>
+    <div class="blueprint-box">
+      <div class="factorlist">Crew A (${a}): ${a-aLeftover} paired ${aLeftover?'+ 1 leftover':''}</div>
+      ${renderBoats(Math.floor(a/2), aLeftover)}
+      <div class="factorlist" style="margin-top:10px">Crew B (${b}): ${b-bLeftover} paired ${bLeftover?'+ 1 leftover':''}</div>
+      ${renderBoats(Math.floor(b/2), bLeftover)}
+      <div class="btnrow" style="justify-content:center">
+        ${!state.s2_revealed
+          ? `<button class="btn big" onclick="revealCombine()">🔓 Combine the crews</button>`
+          : `<div class="step1banner">${aLeftover && bLeftover
+              ? `Both leftovers pair up WITH EACH OTHER! Combined total ${combined} is EVEN.`
+              : (aLeftover || bLeftover
+                ? `One leftover has no partner. Combined total ${combined} is ODD.`
+                : `No leftovers at all. Combined total ${combined} is EVEN.`)}</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+function pickScenario(i){ state.s2_scenario = i; state.s2_revealed = false; save(); render(); }
+function revealCombine(){ state.s2_revealed = true; save(); render(); }
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Engineer's Method</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big">Two leftovers <span class="n">PAIR UP</span> (even).<br>One leftover stays <span class="n">ALONE</span> (odd).<br>No leftovers stay <span class="n">GONE</span> (even).</div>
+    </div>
+    <table class="divtable">
+      <tr><td>even + even</td><td>= even</td></tr>
+      <tr><td>odd + odd</td><td>= even</td></tr>
+      <tr><td>even + odd</td><td>= odd</td></tr>
+      <tr><td>even &times; anything</td><td>= even</td></tr>
+      <tr><td>odd &times; odd</td><td>= odd</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: you never need to add the actual numbers to know the parity — just count how many leftovers are in the room.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — The Proof</div>
+    <h2>Writing it with algebra</h2>
+    <p>Every even number is 2 groups of something with nothing left over: <b>even = 2k</b>. Every odd number is the same, plus one leftover: <b>odd = 2k+1</b>.</p>
+    <div class="blueprint-box">
+      <div class="factorlist">7 = 2(3)+1 &nbsp;&nbsp; 5 = 2(2)+1<br>7 + 5 = 2(3)+1 + 2(2)+1 = 2(3)+2(2)+2 = 2(3+2+1) = 2(6) = 12</div>
+    </div>
+    <p><b>Here's the proof, engineer-style:</b> when you add two odd numbers, the "+1" leftovers combine into their OWN new pair — that extra pair joins the rest, and everything becomes a multiple of 2 again. That's exactly what you saw in Stage 2: two lonely crew members always find each other.</p>
+    <div class="faq">
+      <div class="q">What about odd &times; odd?</div>
+      <div class="a">Every row of an odd&times;odd array has one leftover column, AND every column has one leftover row — multiplying leftovers together always leaves exactly one unpaired square in the corner. That's why odd &times; odd is always odd.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Why is even &times; anything always even?</div>
+      <div class="a">If one number is already perfectly paired (2k), multiplying it by any whole number just makes MORE perfect pairs — 2k &times; m = 2(km), still a multiple of 2, no matter what m is.</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='list'){
+    return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`<div class="pairrow">${r}</div>`).join('')}</div></div>`;
+  }
+  if(v.type==='boats'){
+    return `<div class="blueprint-box">${renderBoats(v.pairs, v.leftover)}<div class="factorlist">${v.caption}</div></div>`;
+  }
+  if(v.type==='loneCrew'){
+    let html = `<div class="boatrow">`;
+    for(let i=0;i<v.count;i++) html += `<div class="boat leftover">🧑</div>`;
+    html += `</div>`;
+    return `<div class="blueprint-box">${html}<div class="factorlist">${v.caption}</div></div>`;
+  }
+  if(v.type==='mismatch'){
+    return `<div class="blueprint-box">
+      <div class="checkgridlike" style="display:flex;gap:10px;justify-content:center">
+        <div class="resultmsg nofit" style="min-width:110px">NEEDED<br><b style="font-size:16px">${v.needed}</b></div>
+        <div class="resultmsg nofit" style="min-width:110px">ACTUAL<br><b style="font-size:16px">${v.actual}</b></div>
+      </div>
+      <div class="factorlist">${v.caption}</div>
+    </div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: 'The Impossible Lifeboat Order',
+    text: 'The captain wants all 7 lifeboats to carry an ODD number of people each, using all 50 crew with none left on deck. Is this possible?',
+    steps: [
+      { text:'Step 1: Each of the 7 lifeboats has an ODD headcount \u2014 which means each one has exactly 1 crew member who can\u2019t be paired off within their own boat.',
+        visual:{type:'loneCrew', count:7, caption:'7 lifeboats &rarr; 7 unpaired crew members, one per boat'} },
+      { text:'Step 2: Now let those 7 leftover crew members try to pair up WITH EACH OTHER across boats. 7 is odd, so one always has no partner.',
+        visual:{type:'boats', pairs:3, leftover:true, caption:'7 leftovers &rarr; 3 pairs + 1 still unpaired'} },
+      { text:'Step 3: That one unpaired leftover means the grand total MUST come out ODD \u2014 no matter which 7 odd numbers you pick.' },
+      { text:'Answer: Impossible.', visual:{type:'mismatch', needed:'ODD', actual:'50 (EVEN)', caption:'The plan requires an odd total, but 50 is even \u2014 no arrangement of crew sizes can ever satisfy both.'} }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Symmetry Experiment',
+    text: 'A chemist has 15 test tubes and wants to pair them up completely for a symmetry experiment, with none left over. Is this possible?',
+    steps: [
+      { text:'Step 1: Check whether 15 is even or odd: 15 = 2(7) + 1.',
+        visual:{type:'boats', pairs:7, leftover:true, caption:'15 tubes &rarr; 7 pairs + 1 always left alone'} },
+      { text:'Step 2: An odd number always has exactly one leftover, no matter how you group the pairs.' },
+      { text:'Answer: Impossible. However she arranges the 15 tubes, one tube always sits alone \u2014 that\u2019s guaranteed by parity, not by trying every arrangement.' }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Two Rows",
+    text: 'Row A has an ODD number of blocks. Row B also has an ODD number of blocks. Can the total ever be EVEN?',
+    steps: [
+      { text:'Step 1: Try real numbers \u2014 Row A = 7 blocks, Row B = 5 blocks. Each row has its own lonely leftover block.',
+        visual:{type:'boats', pairs:3, leftover:true, caption:'Row A (7): 3 pairs + 1 leftover'} },
+      { text:'Step 2: Row B\u2019s leftover meets Row A\u2019s leftover \u2014 and they pair up WITH EACH OTHER.',
+        visual:{type:'boats', pairs:6, leftover:false, caption:'7 + 5 = 12 &rarr; 6 clean pairs, nobody left over'} },
+      { text:'Answer: Yes! Odd + odd is ALWAYS even \u2014 the two lonely leftovers become a brand new pair, every single time.' }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${data.steps[i].visual ? renderVisual(data.steps[i].visual) : ''}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: A chessboard has 64 squares \u2014 32 black, 32 white, alternating like a checkerboard.",
+  "Step 2: The two OPPOSITE corners of a chessboard are always the SAME color. Removing both leaves 30 of one color and 32 of the other.",
+  "Step 3: Every single domino covers exactly ONE black and ONE white square \u2014 no domino can ever cover two of the same color.",
+  "Answer: Impossible! Since the colors are unequal (30 vs 32), no arrangement of dominoes can ever cover the board \u2014 parity proves it without trying a single placement. This is one of the most famous puzzles in mathematics."
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>The Famous Chessboard Puzzle:</b> Can a chessboard with two OPPOSITE corners removed be fully covered by 1&times;2 dominoes?</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Even & Odd.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>

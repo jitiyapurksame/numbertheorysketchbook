@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Patterns">
+<title>Module 11: Number Patterns — Deck Stacking Sequences</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  /* Triangular stack */
+  .stackrow{ display:flex; justify-content:center; gap:4px; margin-bottom:4px; }
+  .crate{ width:22px;height:22px; background:var(--accent-brass); border:1.5px solid var(--accent-brass-light); border-radius:4px; }
+  .crate.mirror{ background:var(--line-blueprint-dim); border-color:var(--line-blueprint); }
+
+  .runningtotal{ text-align:center; font-family:'Space Mono',monospace; font-size:16px; font-weight:700; color:var(--text-on-blueprint); margin:10px 0 4px; }
+  .runningtotal .lbl{ display:block; font-size:11px; color:var(--accent-brass-light); font-weight:400; }
+
+  .fibchain{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:12px 0; }
+  .fibterm{
+    background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:14px;
+    padding:8px 12px; border-radius:8px; border:2px solid var(--accent-brass-light); min-width:36px; text-align:center;
+  }
+  .fibterm.newest{ background:var(--success); color:#fff; border-color:#fff; animation: pop .3s ease; }
+  @keyframes pop{ from{ transform:scale(0.7); opacity:0; } to{ transform:scale(1); opacity:1; } }
+
+  .rainbowlist{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+  .pairrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--accent-brass);
+  }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:15px; font-weight:700; line-height:1.65; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:90px; }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Cargo Stacking Division</div>
+  <h1>🍄 Module 11: Number Patterns</h1>
+  <div class="sub">Deck Stacking Sequences — triangles, Fibonacci & beyond</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — STACK ONE ROW AT A TIME</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= MATH HELPERS ================= */
+function triangular(n){ return n*(n+1)/2; }
+function fibonacci(n){
+  if(n<=2) return 1;
+  let a=1,b=1;
+  for(let i=3;i<=n;i++){ const c=a+b; a=b; b=c; }
+  return b;
+}
+function fibSeries(upTo){
+  const seq=[1,1];
+  while(seq.length<upTo) seq.push(seq[seq.length-1]+seq[seq.length-2]);
+  return seq.slice(0,upTo);
+}
+
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('nts_m11_patterns'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('nts_m11_patterns', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_rows: 0,
+  s2_terms: 2,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= STAGE 1: VISUAL MODEL (TRIANGULAR STACK) ================= */
+function renderStage1(){
+  const rows = state.s1_rows;
+  const total = triangular(rows);
+  const maxRows = 8;
+  const done = rows >= maxRows;
+
+  let stackHtml = '';
+  for(let r=1;r<=rows;r++){
+    stackHtml += `<div class="stackrow">${Array(r).fill('<div class="crate"></div>').join('')}</div>`;
+  }
+
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — Stacking the Deck Pyramid</div>
+    <h2>Add one MORE crate than last row, every time</h2>
+    <p>Row 1 has 1 crate. Row 2 has 2. Row 3 has 3. Add one row at a time and watch the total grow. That's Step 1.</p>
+    <div class="blueprint-box">
+      <div>${stackHtml}</div>
+      <div class="runningtotal"><span class="lbl">TOTAL CRATES SO FAR</span>${total}</div>
+      ${!done
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="addRow1()">📦 Add row ${rows+1} (${rows+1} crates)</button></div>`
+        : `<div class="step1banner">🏁 After ${maxRows} rows: ${total} crates total. These are called TRIANGULAR numbers — 1, 3, 6, 10, 15, 21, 28, 36...</div>`}
+    </div>
+  </div>`;
+}
+function addRow1(){ if(state.s1_rows<8) state.s1_rows++; save(); render(); }
+
+/* ================= STAGE 2: MENTAL STRATEGY (FIBONACCI — A DIFFERENT KIND OF PATTERN) ================= */
+function renderStage2(){
+  const n = state.s2_terms;
+  const seq = fibSeries(n);
+  const done = n >= 10;
+
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — A Different Kind of Growth</div>
+    <h2>Not every pattern grows the same way</h2>
+    <p>Triangular numbers grow by adding a bigger amount each time. This pattern is different: each new term is the SUM of the two terms right before it. Add one term at a time.</p>
+    <div class="blueprint-box">
+      <div class="fibchain">${seq.map((v,i)=>`<div class="fibterm ${i===seq.length-1 && seq.length>2 ?'newest':''}">${v}</div>`).join('')}</div>
+      ${!done
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="addTerm2()">➕ Add next term (${seq[seq.length-1]}+${seq[seq.length-2]}=${seq[seq.length-1]+seq[seq.length-2]})</button></div>`
+        : `<div class="step1banner">🏁 This is the Fibonacci sequence. Notice: there's no "add one more than last time" rule here — each term depends on BOTH of its two neighbors before it.</div>`}
+    </div>
+  </div>`;
+}
+function addTerm2(){
+  if(state.s2_terms<10) state.s2_terms++;
+  save(); render();
+}
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Engineer's Method</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big">Triangular: <span class="n">T(n) = n(n+1)/2</span><br>Fibonacci: <span class="n">F(n) = F(n-1) + F(n-2)</span><br>Two DIFFERENT kinds of pattern.</div>
+    </div>
+    <table class="divtable">
+      <tr><td>Triangular</td><td>1, 3, 6, 10, 15, 21, 28, 36, 45, 55</td></tr>
+      <tr><td>Fibonacci</td><td>1, 1, 2, 3, 5, 8, 13, 21, 34, 55</td></tr>
+      <tr><td>Square (Module 8)</td><td>1, 4, 9, 16, 25, 36, 49, 64, 81, 100</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: ask "does this depend on its POSITION (like n(n+1)/2), or on its own PAST TERMS (like F(n-1)+F(n-2))?" That question tells you which formula to reach for.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — Gauss's Trick</div>
+    <h2>Why is T(n) always n(n+1)/2?</h2>
+    <p>Take the stack for n=8: rows of 1,2,3,4,5,6,7,8. Write it forwards, then write a MIRROR copy backwards underneath, and stack them together:</p>
+    <div class="blueprint-box">
+      <div class="stackrow">${[1,2,3,4,5,6,7,8].map(r=>`<div class="crate"></div>`).join('')}</div>
+      <div class="factorlist" style="margin:2px 0">+ mirrored copy, upside down &darr;</div>
+      <div class="stackrow">${[8,7,6,5,4,3,2,1].map(r=>`<div class="crate mirror"></div>`).join('')}</div>
+      <div class="factorlist">Every column now adds up to exactly <b>9</b> (n+1), and there are <b>8</b> columns (n).<br>Combined total = 8&times;9 = 72 &mdash; but that's TWO stacks, so one stack = 72&divide;2 = 36.</div>
+    </div>
+    <p><b>Here's the proof, engineer-style:</b> two identical triangular stacks always combine into a perfect RECTANGLE, n columns wide and (n+1) tall. A rectangle's area is just width &times; height — no adding required. Since it took two stacks to build that rectangle, one stack is always exactly half: <b>n(n+1) &divide; 2</b>.</p>
+    <div class="faq">
+      <div class="q">Does Fibonacci have a similar slick formula?</div>
+      <div class="a">It does — mathematicians call it Binet's Formula, and it even involves the Golden Ratio! It's well beyond this level, but it's a fun thing to look forward to.</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='list'){
+    return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`<div class="pairrow">${r}</div>`).join('')}</div></div>`;
+  }
+  if(v.type==='cratepair'){
+    const a=v.a, b=v.b;
+    return `<div class="blueprint-box">
+      <div class="stackrow">${Array(a).fill('<div class="crate"></div>').join('')}</div>
+      <div class="stackrow">${Array(b).fill('<div class="crate mirror"></div>').join('')}</div>
+      <div class="factorlist">${a} + ${b} = ${a+b}</div>
+    </div>`;
+  }
+  if(v.type==='chipsum'){
+    return `<div class="blueprint-box">
+      <div class="fibchain">${v.chips.map(c=>`<div class="fibterm">${c}</div>`).join('')}</div>
+      <div class="factorlist">${v.count} &times; ${v.chips[0]} = ${v.count*v.chips[0]}</div>
+    </div>`;
+  }
+  if(v.type==='fibchips'){
+    return `<div class="blueprint-box"><div class="fibchain">${v.seq.map((n,i)=>`<div class="fibterm ${i===v.seq.length-1?'newest':''}">${n}</div>`).join('')}</div></div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: 'The Deck Pyramid',
+    text: 'Deck crews plan a triangular crate stack, 12 rows deep (row 1 has 1 crate, row 2 has 2, and so on). How many total crates, without adding all 12 numbers by hand?',
+    steps: [
+      { text:'Step 1: Use Gauss\u2019s trick \u2014 pair the smallest row with the largest.', visual:{type:'cratepair', a:1, b:12} },
+      { text:'Step 2: Try the next pair in from both ends \u2014 same total every time.', visual:{type:'cratepair', a:2, b:11} },
+      { text:'Step 3: There are 12 rows, making 6 pairs, each worth 13.', visual:{type:'chipsum', chips:[13,13,13,13,13,13], count:6} },
+      { text:'Answer: 78 total crates \u2014 found without adding 12 separate numbers one at a time.' }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Growth Culture',
+    text: 'A lab culture grows by a Fibonacci-style rule: each new sample count is the sum of the previous two, starting 1, 1. Find the 10th sample\u2019s count.',
+    steps: [
+      { text:'Step 1: Build the sequence from the start.', visual:{type:'fibchips', seq:[1,1,2,3,5,8]} },
+      { text:'Step 2: Keep adding the two most recent terms.', visual:{type:'fibchips', seq:[1,1,2,3,5,8,13,21,34]} },
+      { text:'Step 3: One more term to reach position 10.', visual:{type:'fibchips', seq:[1,1,2,3,5,8,13,21,34,55]} },
+      { text:'Answer: The 10th sample count is 55 \u2014 the same famous sequence found in nature\u2019s growth patterns.' }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Level Bonus",
+    text: 'Level n awards a triangular bonus of T(n) coins. How many coins does level 15 award?',
+    steps: [
+      { text:'Step 1: Use Gauss\u2019s trick \u2014 pair row 1 with row 15.', visual:{type:'cratepair', a:1, b:15} },
+      { text:'Step 2: 15 rows makes 7 full pairs, plus 1 row left alone in the middle (since 15 is odd).', visual:{type:'cratepair', a:2, b:14} },
+      { text:'Answer: 15&times;16&divide;2 = 120 \u2014 Level 15 awards 120 coins.' }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${data.steps[i].visual ? renderVisual(data.steps[i].visual) : ''}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: Triangles and squares aren\u2019t the only shapes with number patterns \u2014 pentagons have one too. Pentagonal numbers follow P(n) = n(3n-1)/2.",
+  "Step 2: Try n=5: P(5) = 5&times;(3&times;5-1)&divide;2 = 5&times;14&divide;2.",
+  "Answer: P(5) = 35. The pattern goes 1, 5, 12, 22, 35... every polygon shape hides its own number sequence, built the same way triangular numbers were."
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>Beyond Triangles:</b> What's the 5th Pentagonal number?</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Number Patterns.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>

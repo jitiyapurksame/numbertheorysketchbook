@@ -351,6 +351,12 @@ function renderVisual(v){
   if(v.type==='ladder'){
     return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`<div class="pairrow">${r}</div>`).join('')}</div></div>`;
   }
+  if(v.type==='towerstep'){
+    return `<div class="blueprint-box">
+      <div class="remainingcard"><span class="lbl">CURRENTLY BREAKING DOWN</span>${v.remaining}</div>
+      <div class="tower">${v.bricks.map(p=>`<div class="brick">÷${p}</div>`).join('')}</div>
+    </div>`;
+  }
   return '';
 }
 
@@ -359,9 +365,9 @@ const BOSS_DATA = {
     tag: 'CASE 1 · RMS TITANIC', title: "The Boiler's Prime Blueprint",
     text: 'The shipyard needs 84 units of steel for a new boiler, built from standard prime-sized segments. Find the prime blueprint of 84.',
     steps: [
-      { text:'Step 1: 84 is even, so divide by the smallest prime, 2.', visual:{type:'ladder', rows:['84 &divide; 2 = 42']} },
-      { text:'Step 2: 42 is even too — divide by 2 again.', visual:{type:'ladder', rows:['42 &divide; 2 = 21']} },
-      { text:'Step 3: 21 isn\u2019t even, but it divides by 3. Then 7 is already prime.', visual:{type:'ladder', rows:['21 &divide; 3 = 7', '7 is prime \u2014 stop']} },
+      { text:'Step 1: 84 is even, so divide by the smallest prime, 2.', visual:{type:'towerstep', remaining:42, bricks:[2]} },
+      { text:'Step 2: 42 is even too — divide by 2 again.', visual:{type:'towerstep', remaining:21, bricks:[2,2]} },
+      { text:'Step 3: 21 isn\u2019t even, but it divides by 3. Then 7 is already prime.', visual:{type:'towerstep', remaining:1, bricks:[2,2,3,7]} },
       { text:'Answer: 84 = 2<sup>2</sup> &times; 3 &times; 7.' }
     ]
   },
@@ -369,9 +375,9 @@ const BOSS_DATA = {
     tag: "CASE 2 · SHIP'S LAB", title: 'The Compound\u2019s Blueprint',
     text: 'A chemist wants to break 90 mL of a compound into prime-sized measuring doses. Find the prime blueprint of 90.',
     steps: [
-      { text:'Step 1: 90 is even — divide by 2.', visual:{type:'ladder', rows:['90 &divide; 2 = 45']} },
-      { text:'Step 2: 45 isn\u2019t even, but it divides by 3.', visual:{type:'ladder', rows:['45 &divide; 3 = 15']} },
-      { text:'Step 3: 15 divides by 3 again, leaving 5 \u2014 already prime.', visual:{type:'ladder', rows:['15 &divide; 3 = 5', '5 is prime \u2014 stop']} },
+      { text:'Step 1: 90 is even — divide by 2.', visual:{type:'towerstep', remaining:45, bricks:[2]} },
+      { text:'Step 2: 45 isn\u2019t even, but it divides by 3.', visual:{type:'towerstep', remaining:15, bricks:[2,3]} },
+      { text:'Step 3: 15 divides by 3 again, leaving 5 \u2014 already prime.', visual:{type:'towerstep', remaining:1, bricks:[2,3,3,5]} },
       { text:'Answer: 90 = 2 &times; 3<sup>2</sup> &times; 5.' }
     ]
   },
@@ -379,9 +385,9 @@ const BOSS_DATA = {
     tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Coin Block Tower",
     text: 'Mario wants to stack 48 coin blocks using only prime-sized groups. Find the prime blueprint of 48.',
     steps: [
-      { text:'Step 1: 48 is even — divide by 2, then 2 again.', visual:{type:'ladder', rows:['48 &divide; 2 = 24', '24 &divide; 2 = 12']} },
-      { text:'Step 2: Still even — keep dividing by 2.', visual:{type:'ladder', rows:['12 &divide; 2 = 6', '6 &divide; 2 = 3']} },
-      { text:'Step 3: 3 is already prime — stop here.', visual:{type:'ladder', rows:['3 is prime \u2014 stop']} },
+      { text:'Step 1: 48 is even — divide by 2, then 2 again.', visual:{type:'towerstep', remaining:12, bricks:[2,2]} },
+      { text:'Step 2: Still even — keep dividing by 2.', visual:{type:'towerstep', remaining:3, bricks:[2,2,2,2]} },
+      { text:'Step 3: 3 is already prime — stop here.', visual:{type:'towerstep', remaining:1, bricks:[2,2,2,2,3]} },
       { text:'Answer: 48 = 2<sup>4</sup> &times; 3 \u2014 four 2-bricks and one 3-brick.' }
     ]
   }

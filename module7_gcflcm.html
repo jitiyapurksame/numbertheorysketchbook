@@ -356,6 +356,23 @@ function renderVisual(v){
   if(v.type==='list'){
     return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`<div class="pairrow">${r}</div>`).join('')}</div></div>`;
   }
+  if(v.type==='cutbar'){
+    return `<div class="blueprint-box">${renderCutBar(v.W, v.H, v.count, v.remainder)}</div>`;
+  }
+  if(v.type==='cutbarseries'){
+    return `<div class="blueprint-box">${v.bars.map(b=>renderCutBar(b.W,b.H,b.count,b.remainder)).join('')}</div>`;
+  }
+  if(v.type==='tilegrid'){
+    const cells = Array(v.cols*v.rows).fill(`<div style="aspect-ratio:1;background:var(--accent-brass);border:1px solid var(--accent-brass-light);border-radius:3px"></div>`).join('');
+    return `<div class="blueprint-box">
+      <div style="display:grid;grid-template-columns:repeat(${v.cols},1fr);gap:3px;max-width:200px;margin:0 auto">${cells}</div>
+      <div class="factorlist">${v.cols} &times; ${v.rows} = ${v.cols*v.rows} tiles</div>
+    </div>`;
+  }
+  if(v.type==='countgrid'){
+    const chips = Array(v.n).fill(`<div style="width:20px;height:20px;border-radius:50%;background:var(--accent-brass);border:1.5px solid var(--accent-brass-light)"></div>`).join('');
+    return `<div class="blueprint-box"><div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center">${chips}</div><div class="factorlist">${v.caption}</div></div>`;
+  }
   return '';
 }
 
@@ -364,27 +381,27 @@ const BOSS_DATA = {
     tag: 'CASE 1 · RMS TITANIC', title: 'The Dry Dock Tiles',
     text: 'The dry dock floor is 60m by 84m. Find the largest square tile that fits evenly, and how many tiles are needed in total.',
     steps: [
-      { text:'Step 1: Cut the largest squares from 84&times;60.', visual:{type:'list', rows:['84 = 1&times;60 + 24 left over']} },
-      { text:'Step 2: New rectangle is 60&times;24. Cut again.', visual:{type:'list', rows:['60 = 2&times;24 + 12 left over']} },
-      { text:'Step 3: New rectangle is 24&times;12. Cut once more \u2014 no remainder!', visual:{type:'list', rows:['24 = 2&times;12 exactly']} },
-      { text:'Answer: GCF = 12, so the dock uses 12&times;12 tiles. That\u2019s 5 tiles across (60&divide;12) &times; 7 tiles down (84&divide;12) = 35 tiles total.' }
+      { text:'Step 1: Cut the largest squares from 84&times;60.', visual:{type:'cutbar', W:84, H:60, count:1, remainder:24} },
+      { text:'Step 2: New rectangle is 60&times;24. Cut again.', visual:{type:'cutbar', W:60, H:24, count:2, remainder:12} },
+      { text:'Step 3: New rectangle is 24&times;12. Cut once more \u2014 no remainder!', visual:{type:'cutbar', W:24, H:12, count:2, remainder:0} },
+      { text:'Answer: GCF = 12, so the dock uses 12&times;12 tiles \u2014 5 tiles across (60&divide;12) &times; 7 tiles down (84&divide;12).', visual:{type:'tilegrid', cols:5, rows:7} }
     ]
   },
   2: {
     tag: "CASE 2 · SHIP'S LAB", title: 'The Vial Kits',
     text: 'A lab has 36 red vials and 24 blue vials. Make the maximum number of identical kits with none left over.',
     steps: [
-      { text:'Step 1: Cut the largest squares from 36&times;24.', visual:{type:'list', rows:['36 = 1&times;24 + 12 left over']} },
-      { text:'Step 2: New rectangle is 24&times;12. Cut again \u2014 no remainder!', visual:{type:'list', rows:['24 = 2&times;12 exactly']} },
+      { text:'Step 1: Cut the largest squares from 36&times;24.', visual:{type:'cutbar', W:36, H:24, count:1, remainder:12} },
+      { text:'Step 2: New rectangle is 24&times;12. Cut again \u2014 no remainder!', visual:{type:'cutbar', W:24, H:12, count:2, remainder:0} },
       { text:'Step 3: GCF = 12 \u2014 that\u2019s the maximum number of identical kits.' },
-      { text:'Answer: 12 kits, each with 3 red vials (36&divide;12) and 2 blue vials (24&divide;12).' }
+      { text:'Answer: 12 kits, each with 3 red vials (36&divide;12) and 2 blue vials (24&divide;12).', visual:{type:'countgrid', n:12, caption:'12 identical kits'} }
     ]
   },
   3: {
     tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Block Rhythm",
     text: 'Coin blocks appear every 8 tiles, mushroom blocks every 12 tiles. Use the shortcut (not a multiple-chase!) to find where both appear together.',
     steps: [
-      { text:'Step 1: Find the GCF of 8 and 12 by cutting squares from 12&times;8.', visual:{type:'list', rows:['12 = 1&times;8 + 4 left over', '8 = 2&times;4 exactly']} },
+      { text:'Step 1: Find the GCF of 8 and 12 by cutting squares from 12&times;8.', visual:{type:'cutbarseries', bars:[{W:12,H:8,count:1,remainder:4},{W:8,H:4,count:2,remainder:0}]} },
       { text:'Step 2: GCF = 4. Now use the shortcut: multiply the originals.', visual:{type:'list', rows:['8 &times; 12 = 96']} },
       { text:'Step 3: Divide by the GCF.', visual:{type:'list', rows:['96 &divide; 4 = 24']} },
       { text:'Answer: LCM(8,12) = 24 \u2014 both blocks appear together at tile 24, found without listing a single multiple by hand.' }

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Powers">
+<title>Module 8: Powers — Ship Scaling Blueprints</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .numpicker{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+  .numpicker button{
+    width:44px;height:44px; border-radius:8px; border:2px solid var(--bg-paper-alt); background:#fff;
+    font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; color:var(--text-ink);
+    -webkit-user-select:none; touch-action:manipulation;
+  }
+  .numpicker button.selected{ border-color:var(--accent-brass); background:var(--accent-brass-light); }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  .sqgrid{ display:grid; gap:3px; margin:12px auto; max-width:280px; }
+  .tile{ aspect-ratio:1; background:var(--accent-brass); border:1.5px solid var(--accent-brass-light); border-radius:3px; }
+  .tile.new{ background:var(--alert); border-color:#F4CB8E; }
+
+  .layerstack{ display:flex; flex-direction:column; gap:8px; margin:12px 0; }
+  .layercard{ background:rgba(255,255,255,0.08); border-radius:8px; padding:8px; display:flex; align-items:center; gap:10px; }
+  .layercard .lyrlabel{ font-family:'Space Mono',monospace; font-size:11px; color:var(--accent-brass-light); min-width:56px; }
+  .layercard .sqgrid{ margin:0; max-width:90px; }
+
+  .runningtotal{ text-align:center; font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:var(--text-on-blueprint); margin:10px 0 4px; }
+  .runningtotal .lbl{ display:block; font-size:11px; color:var(--accent-brass-light); font-weight:400; }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:15.5px; font-weight:700; line-height:1.65; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:60px; }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .rainbowlist{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+  .pairrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--accent-brass);
+  }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Naval Architecture Division</div>
+  <h1>📏 Module 8: Powers</h1>
+  <div class="sub">Ship Scaling Blueprints — squares, cubes & patterns</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — LAY ONE ROW, STACK ONE LAYER</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('nts_m8_powers'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('nts_m8_powers', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_n: 5,
+  s1_rowsAdded: 0,
+  s2_layersAdded: 0,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= STAGE 1: VISUAL MODEL (SQUARES) ================= */
+function renderSqGrid(n, cellCount, maxWidthPx){
+  let tiles = '';
+  for(let i=0;i<cellCount;i++) tiles += `<div class="tile"></div>`;
+  return `<div class="sqgrid" style="grid-template-columns:repeat(${n},1fr); max-width:${maxWidthPx||280}px">${tiles}</div>`;
+}
+function renderStage1(){
+  const n = state.s1_n;
+  const rows = state.s1_rowsAdded;
+  const total = rows * n;
+  const done = rows >= n;
+
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — Laying the Deck</div>
+    <h2>Build a ${n}-by-${n} square deck, one row at a time</h2>
+    <p>A "squared" number is literally a square shape — that's where the name comes from! Add one row of tiles at a time. That's Step 1.</p>
+    <div class="numpicker">
+      ${[3,4,5,6,7,8].map(num=>`<button class="${num===n?'selected':''}" onclick="pickN1(${num})">${num}</button>`).join('')}
+    </div>
+    <div class="blueprint-box">
+      ${renderSqGrid(n, total)}
+      <div class="runningtotal"><span class="lbl">TILES SO FAR</span>${total}</div>
+      ${!done
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="addRow1()">➕ Add row ${rows+1} of ${n}</button></div>`
+        : `<div class="step1banner">🏁 Deck complete! ${n} rows of ${n} = ${n}<sup>2</sup> = ${total} tiles. We call this "${n} squared."</div>`}
+    </div>
+  </div>`;
+}
+function pickN1(n){ state.s1_n = n; state.s1_rowsAdded = 0; state.s2_layersAdded = 0; save(); render(); }
+function addRow1(){ state.s1_rowsAdded++; save(); render(); }
+
+/* ================= STAGE 2: MENTAL STRATEGY (CUBES AS STACKED SQUARES) ================= */
+function renderStage2(){
+  const n = state.s1_n;
+  const sq = n*n;
+  const layers = state.s2_layersAdded;
+  const total = layers * sq;
+  const done = layers >= n;
+
+  let stackHtml = '';
+  for(let i=0;i<layers;i++){
+    stackHtml += `<div class="layercard"><div class="lyrlabel">Layer ${i+1}</div>${renderSqGrid(n, sq, 90)}</div>`;
+  }
+
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — Stacking Squares into a Cube</div>
+    <h2>A cube is just ${n} copies of your square deck, stacked up</h2>
+    <p>You already built a ${n}&times;${n} deck (${sq} tiles). Now stack ${n} of them to build a solid ballast block. Add one layer at a time.</p>
+    <div class="blueprint-box">
+      <div class="layerstack">${stackHtml}</div>
+      <div class="runningtotal"><span class="lbl">TOTAL BLOCKS SO FAR</span>${total}</div>
+      ${!done
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="addLayer2()">➕ Add layer ${layers+1} of ${n}</button></div>`
+        : `<div class="step1banner">🏁 Cube complete! ${n} layers &times; ${sq} tiles = ${n}<sup>3</sup> = ${total}. Notice: ${n}<sup>3</sup> = ${n} &times; ${n}<sup>2</sup> — a cube is just a square, stacked ${n} times!</div>`}
+    </div>
+  </div>`;
+}
+function addLayer2(){ state.s2_layersAdded++; save(); render(); }
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Engineer's Method</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big">A power <span class="n">b<sup>e</sup></span> means<br>multiply <span class="n">b</span> by itself,<br><span class="n">e</span> times.<br>Squared = 2 dimensions.<br>Cubed = 3 dimensions.</div>
+    </div>
+    <table class="divtable">
+      <tr><td>Squares</td><td>1,4,9,16,25,36,49,64,81,100</td></tr>
+      <tr><td>Cubes</td><td>1,8,27,64,125</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: "squared" and "cubed" aren't just math words — they're literally shapes. A number squared tiles a flat deck. A number cubed fills a solid block.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  const n = state.s1_n;
+  const size = n+1;
+  let cells = '';
+  for(let r=0;r<size;r++){
+    for(let c=0;c<size;c++){
+      const isNew = (r===n || c===n);
+      cells += `<div class="tile ${isNew?'new':''}"></div>`;
+    }
+  }
+  const oldTotal = n*n;
+  const newBorder = 2*n+1;
+  const newTotal = size*size;
+
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — The Border Pattern</div>
+    <h2>What happens when a square grows by 1?</h2>
+    <p>Your ${n}&times;${n} deck holds ${oldTotal} tiles. If engineers scale it up to ${size}&times;${size}, how many NEW tiles get added? Watch the border:</p>
+    <div class="blueprint-box">
+      <div class="sqgrid" style="grid-template-columns:repeat(${size},1fr)">${cells}</div>
+      <div class="factorlist">${oldTotal} old tiles (brass) + <b>${newBorder}</b> new border tiles (amber) = ${newTotal} = ${size}<sup>2</sup></div>
+    </div>
+    <p><b>Here's the pattern, engineer-style:</b> the new border is always exactly ONE extra row + ONE extra column + ONE corner tile: ${n} + ${n} + 1 = ${newBorder}. In general, growing a square from n to n+1 always adds exactly <b>2n+1</b> tiles — always an ODD number.</p>
+    <div class="faq">
+      <div class="q">Does this pattern ever break?</div>
+      <div class="a">Never — try it with any size deck. The differences between consecutive squares (3, 5, 7, 9, 11...) are always consecutive odd numbers. That's not a coincidence; it's the border rule every time.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Why does any number to the power of 0 equal 1?</div>
+      <div class="a">Look at the pattern: 2<sup>4</sup>=16, 2<sup>3</sup>=8, 2<sup>2</sup>=4, 2<sup>1</sup>=2 — each step down divides by 2. Keep going: 2<sup>0</sup> must be 2&divide;2 = 1. The pattern only stays consistent if the power of 0 is always 1.</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='list'){
+    return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`<div class="pairrow">${r}</div>`).join('')}</div></div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: 'The Observation Deck Refit',
+    text: 'A square observation deck is 12 tiles per side. Engineers plan to refit it to 13 tiles per side. How many EXTRA tiles are needed \u2014 without recalculating the whole deck?',
+    steps: [
+      { text:'Step 1: Find the current deck size.', visual:{type:'list', rows:['12&times;12 = 144 tiles']} },
+      { text:'Step 2: Use the border rule: growing from n to n+1 always adds 2n+1 tiles.', visual:{type:'list', rows:['2&times;12 + 1 = 25 new tiles']} },
+      { text:'Step 3: Check it against the full recalculation.', visual:{type:'list', rows:['13&times;13 = 169', '144 + 25 = 169 \u2713']} },
+      { text:'Answer: Only 25 extra tiles needed \u2014 found without recalculating the whole 169-tile deck.' }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Cubic Sample Container',
+    text: 'A cubic sample container has 4 cm sides. How many 1 cm&sup3; unit cubes fit inside? Use the layer method.',
+    steps: [
+      { text:'Step 1: Each layer is a 4&times;4 square.', visual:{type:'list', rows:['4&times;4 = 16 cubes per layer']} },
+      { text:'Step 2: Stack 4 layers to fill the container.', visual:{type:'list', rows:['4 layers &times; 16 = 64']} },
+      { text:'Step 3: That matches 4<sup>3</sup> directly.' },
+      { text:'Answer: 64 unit cubes fill the container \u2014 4<sup>3</sup> = 64.' }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Doubling Surprise",
+    text: 'Mario builds a cube tower 3 blocks per side. If he DOUBLES the side to 6 blocks, does the total number of blocks also just double?',
+    steps: [
+      { text:'Step 1: Find the original tower size.', visual:{type:'list', rows:['3<sup>3</sup> = 27 blocks']} },
+      { text:'Step 2: Find the doubled tower size.', visual:{type:'list', rows:['6<sup>3</sup> = 216 blocks']} },
+      { text:'Step 3: Compare \u2014 is 216 double 27?', visual:{type:'list', rows:['27 &times; 2 = 54 (NOT 216!)', '216 &divide; 27 = 8']} },
+      { text:'Answer: No! Doubling the side makes the tower 8 times bigger, not 2 times \u2014 because 8 = 2<sup>3</sup>. Volume scales by the CUBE of the size change.' }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${data.steps[i].visual ? renderVisual(data.steps[i].visual) : ''}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: List powers of 2, counting down: 2<sup>4</sup>=16, 2<sup>3</sup>=8, 2<sup>2</sup>=4, 2<sup>1</sup>=2.",
+  "Step 2: Notice each step divides by 2. Keep the pattern going one more step: 2 &divide; 2 = 1.",
+  "Answer: 2<sup>0</sup> = 1. In fact ANY number (except 0) to the power of 0 equals 1 \u2014 same pattern, every time."
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>The Power of Zero:</b> Why does 2<sup>0</sup> equal 1?</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Powers.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>
