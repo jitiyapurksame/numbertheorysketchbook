@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Diophantine">
+<title>Module 13: Diophantine — Cargo Balancing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  /* Table */
+  .checktable{ width:100%; border-collapse:collapse; font-family:'Space Mono',monospace; font-size:12.5px; margin:10px 0; }
+  .checktable th{ color:var(--accent-brass-light); font-size:11px; padding:6px 4px; border-bottom:1.5px solid var(--accent-brass); }
+  .checktable td{ text-align:center; padding:6px 4px; border-bottom:1px solid rgba(255,255,255,0.1); color:var(--text-on-blueprint); vertical-align:middle; }
+  .checktable tr.valid td{ background:rgba(76,154,139,0.15); }
+  .checktable tr.invalid td{ opacity:0.55; }
+
+  .cratewrap{ display:flex; flex-wrap:wrap; gap:2px; justify-content:center; max-width:90px; margin:0 auto; }
+  .minicrate{ width:9px; height:9px; background:var(--accent-brass); border:1px solid var(--accent-brass-light); border-radius:2px; }
+
+  .leftoverbar-wrap{ width:74px; height:16px; background:rgba(255,255,255,0.12); border-radius:5px; overflow:hidden; margin:0 auto; position:relative; }
+  .leftoverbar-fill{ height:100%; border-radius:5px 0 0 5px; }
+  .leftoverbar-fill.valid{ background:var(--success); }
+  .leftoverbar-fill.invalid{ background:var(--alert); }
+  .leftoverbar-label{ font-size:10px; margin-top:2px; color:var(--text-on-blueprint); }
+
+  .validmark{ font-size:14px; }
+
+  .rainbowlist{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+  .pairrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--accent-brass);
+  }
+
+  .verdictbox{ text-align:center; font-family:'Space Mono',monospace; font-size:14px; font-weight:700; padding:12px; border-radius:10px; margin-top:8px; }
+  .verdictbox.match{ background:rgba(76,154,139,0.2); color:var(--success); }
+  .verdictbox.mismatch{ background:rgba(224,164,88,0.22); color:var(--alert); }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:14.5px; font-weight:700; line-height:1.65; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:100px; }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Cargo Balancing Division</div>
+  <h1>⚖️ Module 13: Diophantine</h1>
+  <div class="sub">Cargo Balancing — whole crates only, no exceptions</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — TEST ONE COMBINATION AT A TIME</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('nts_m13_diophantine'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('nts_m13_diophantine', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_xTried: 0,
+  s2_reveal: 0,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= VISUAL TABLE ROW HELPER ================= */
+function renderCrateIcons(count){
+  return `<div class="cratewrap">${Array(count).fill('<div class="minicrate"></div>').join('')}</div>`;
+}
+function renderLeftoverBar(leftover, total, valid){
+  const pct = Math.max(0, Math.min(100, (leftover/total)*100));
+  return `<div class="leftoverbar-wrap"><div class="leftoverbar-fill ${valid?'valid':'invalid'}" style="width:${pct}%"></div></div>
+  <div class="leftoverbar-label">${leftover}</div>`;
+}
+
+/* ================= STAGE 1: VISUAL MODEL (GUESS & CHECK TABLE) ================= */
+function renderStage1(){
+  const target = 31;
+  const rows = [];
+  for(let x=0; x<=state.s1_xTried; x++){
+    const rem = target - 3*x;
+    const validY = rem >= 0 && rem % 5 === 0;
+    rows.push({x, rem, y: validY ? rem/5 : null, valid: validY});
+  }
+  const canTryMore = state.s1_xTried < 10 && (target - 3*(state.s1_xTried+1)) >= 0;
+
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — Loading the Hold</div>
+    <h2>Reach exactly 31 tons using 3-ton and 5-ton crates only</h2>
+    <p>You can't load half a crate. Try one number of 3-ton crates at a time, and check if the leftover weight divides evenly into whole 5-ton crates.</p>
+    <div class="blueprint-box">
+      <table class="checktable">
+        <tr><th>3-ton crates loaded</th><th>Leftover weight</th><th>÷5 whole?</th></tr>
+        ${rows.map(r=>`<tr class="${r.valid?'valid':'invalid'}">
+          <td>${renderCrateIcons(r.x)}<div class="leftoverbar-label">x=${r.x}</div></td>
+          <td>${renderLeftoverBar(r.rem, target, r.valid)}</td>
+          <td class="validmark">${r.valid?`✅<br>y=${r.y}`:'✗'}</td>
+        </tr>`).join('')}
+      </table>
+      ${canTryMore
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="tryNext1()">📦 Try x = ${state.s1_xTried+1} crates</button></div>`
+        : `<div class="step1banner">🏁 Found valid combinations! Notice how the valid rows are spaced apart — that's not random. Head to Stage 2 to find the pattern.</div>`}
+    </div>
+  </div>`;
+}
+function tryNext1(){ state.s1_xTried++; save(); render(); }
+
+/* ================= STAGE 2: MENTAL STRATEGY (THE SHIFT PATTERN) ================= */
+function renderStage2(){
+  const r = state.s2_reveal;
+  const steps = [
+    'You already found one solution: x=2, y=5 (3&times;2 + 5&times;5 = 6+25 = 31).',
+    'Try trading: add 5 more to x, and take away 3 from y \u2014 x=7, y=2.',
+    'Check it: 3&times;7 + 5&times;2 = 21+10 = 31. Still works!',
+    'The swap always balances because 3&times;5 = 5&times;3 \u2014 whatever you add on one side, you remove the same amount on the other.'
+  ];
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — The Trade Pattern</div>
+    <h2>Find MORE solutions without guessing from scratch</h2>
+    <p>Once you have ONE working combination, there's a shortcut to find every other one — no need to restart the table.</p>
+    <div class="blueprint-box">
+      <div class="rainbowlist">${Array.from({length:r}).map((_,i)=>`<div class="pairrow">${steps[i]}</div>`).join('')}</div>
+      <div class="btnrow" style="justify-content:center">
+        ${r < steps.length
+          ? `<button class="btn big" onclick="revealS2()">🔓 Show me the next step</button>`
+          : `<div class="step1banner">💡 Every solution to 3x+5y=31 follows the pattern: x = 2+5t, y = 5-3t. Trade 5 crates of one size for 3 of the other, and the total never changes.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+function revealS2(){ state.s2_reveal++; save(); render(); }
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Engineer's Method</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big">For <span class="n">ax + by = c</span>:<br>find ONE solution by testing,<br>then trade <span class="n">+b</span> to x and <span class="n">&minus;a</span> to y<br>to find every other one.</div>
+    </div>
+    <table class="divtable">
+      <tr><td>3x+5y=31</td><td>x=2+5t, y=5&minus;3t</td></tr>
+      <tr><td>4x+3y=23</td><td>from (2,5): x=2+3t, y=5&minus;4t</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: a solution ONLY exists in whole numbers if the GCF of the two crate sizes divides evenly into the target — a direct callback to Module 7's GCF work.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — The Proof</div>
+    <h2>Why does trading +5 and &minus;3 always balance?</h2>
+    <p>Start from a known solution, x=2, y=5, and apply the trade algebraically:</p>
+    <div class="blueprint-box">
+      <div class="factorlist">
+        3(x+5) + 5(y&minus;3)<br>
+        = 3x + 15 + 5y &minus; 15<br>
+        = 3x + 5y<br>
+        = 31 (unchanged!)
+      </div>
+    </div>
+    <p><b>Here's the proof, engineer-style:</b> adding 5 to x contributes exactly 3&times;5=15 extra tons. Subtracting 3 from y removes exactly 5&times;3=15 tons. Those two changes are the SAME size (15=15), so they cancel out perfectly — the total never moves.</p>
+    <div class="faq">
+      <div class="q">Why 5 and 3 specifically, and not some other numbers?</div>
+      <div class="a">They're swapped from the original equation: the trade amount for x is always the OTHER crate's size (5), and the trade amount for y is always the FIRST crate's size (3). That's what makes 3&times;5 always equal 5&times;3.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Does a solution always exist?</div>
+      <div class="a">Not always! If the GCF of the two crate sizes doesn't divide evenly into the target weight, NO whole-number combination can ever reach it \u2014 no matter how long you search. You'll see this in the Boss Level.</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='list'){
+    return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`<div class="pairrow">${r}</div>`).join('')}</div></div>`;
+  }
+  if(v.type==='verdict'){
+    return `<div class="blueprint-box"><div class="verdictbox ${v.match?'match':'mismatch'}">${v.text}</div></div>`;
+  }
+  if(v.type==='table'){
+    return `<div class="blueprint-box"><table class="checktable">
+      <tr><th>${v.headers[0]}</th><th>${v.headers[1]}</th><th>${v.headers[2]}</th></tr>
+      ${v.rows.map(r=>`<tr class="${r.valid?'valid':'invalid'}">
+        <td>${renderCrateIcons(r.count)}<div class="leftoverbar-label">${r.count}</div></td>
+        <td>${renderLeftoverBar(r.leftover, v.total, r.valid)}</td>
+        <td class="validmark">${r.valid?`✅<br>${r.yLabel}`:'✗'}</td>
+      </tr>`).join('')}
+    </table></div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: 'The Second Combination',
+    text: 'You know 3x+5y=31 has a solution at x=2, y=5. Find a DIFFERENT whole-number combination without restarting the table.',
+    steps: [
+      { text:'Step 1: Apply the trade pattern \u2014 add 5 to x, subtract 3 from y.', visual:{type:'list', rows:['x: 2 &rarr; 2+5 = 7', 'y: 5 &rarr; 5&minus;3 = 2']} },
+      { text:'Step 2: Check it balances.', visual:{type:'list', rows:['3&times;7 + 5&times;2 = 21+10 = 31']} },
+      { text:'Answer: x=7, y=2 also works \u2014 7 crates of 3 tons and 2 crates of 5 tons, found with one trade instead of testing x=3,4,5,6 first.' }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Exact Mixture',
+    text: 'A chemist needs exactly 23 mL using only 4 mL and 3 mL scoops. Find a whole-number combination.',
+    steps: [
+      { text:'Step 1: Test scoop counts of 4 mL, checking if the leftover divides evenly by 3.', visual:{type:'table', headers:['4mL scoops (x)','Leftover (mL)','÷3 whole?'], total:23, rows:[
+          {count:0, leftover:23, valid:false},
+          {count:1, leftover:19, valid:false},
+          {count:2, leftover:15, valid:true, yLabel:'y=5'}
+        ]} },
+      { text:'Step 2: x=2 works \u2014 check it.', visual:{type:'list', rows:['4&times;2 + 3&times;5 = 8+15 = 23']} },
+      { text:'Answer: 2 scoops of 4 mL and 5 scoops of 3 mL \u2014 exactly 23 mL, no partial scoops needed.' }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Exact Score",
+    text: 'Mario needs exactly 29 points using only 4-point coins and 7-point coins. Find a whole-number combination.',
+    steps: [
+      { text:'Step 1: Test 7-point coin counts, checking if the leftover divides evenly by 4.', visual:{type:'table', headers:['7-pt coins (y)','Leftover (pts)','÷4 whole?'], total:29, rows:[
+          {count:0, leftover:29, valid:false},
+          {count:1, leftover:22, valid:false},
+          {count:2, leftover:15, valid:false},
+          {count:3, leftover:8, valid:true, yLabel:'x=2'}
+        ]} },
+      { text:'Step 2: Check it balances.', visual:{type:'list', rows:['4&times;2 + 7&times;3 = 8+21 = 29']} },
+      { text:'Answer: 2 four-point coins and 3 seven-point coins \u2014 exactly 29, and it happens to be the ONLY combination that works this time.' }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${data.steps[i].visual ? renderVisual(data.steps[i].visual) : ''}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: Check GCF(6,9). Both 6 and 9 share a factor of 3.",
+  "Step 2: Is 20 divisible by 3? 20 &divide; 3 = 6 remainder 2 \u2014 NO.",
+  "Answer: Impossible! Since GCF(6,9)=3 doesn't divide evenly into 20, NO whole-number combination of 6s and 9s can ever total exactly 20 \u2014 proven without testing a single combination, just like Module 10's impossible lifeboat order."
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>The Impossible Load:</b> Can 6-ton and 9-ton crates ever total EXACTLY 20 tons?</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Diophantine equations.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>

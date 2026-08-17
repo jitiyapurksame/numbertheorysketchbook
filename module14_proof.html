@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Proof">
+<title>Module 14: Proof — Inspector's Logbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  .logentry{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px; margin:6px 0;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--success);
+  }
+  .logentry.broken{ border-left-color:var(--alert); background:rgba(224,164,88,0.2); }
+  .logentry .verdict{ font-weight:700; }
+  .logentry.broken .verdict{ color:var(--alert); }
+  .logentry:not(.broken) .verdict{ color:var(--success); }
+
+  .verdictbox{ text-align:center; font-family:'Space Mono',monospace; font-size:15px; font-weight:700; padding:12px; border-radius:10px; margin-top:8px; }
+  .verdictbox.always{ background:rgba(76,154,139,0.2); color:var(--success); }
+  .verdictbox.never{ background:rgba(224,164,88,0.22); color:var(--alert); }
+  .verdictbox.sometimes{ background:rgba(191,227,240,0.2); color:var(--line-blueprint); }
+
+  .rainbowlist{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+  .pairrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--accent-brass);
+  }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:14.5px; font-weight:700; line-height:1.7; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .divtable{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .divtable td{ padding:8px 6px; border-bottom:1px solid var(--bg-paper-alt); }
+  .divtable td:first-child{ font-family:'Space Mono',monospace; font-weight:700; color:var(--accent-brass-dark); width:100px; }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; Safety Inspection Division</div>
+  <h1>📓 Module 14: Proof</h1>
+  <div class="sub">Inspector's Logbook — Always, Sometimes, or Never?</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — TEST ONE CASE AT A TIME</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('nts_m14_proof'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('nts_m14_proof', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  s1_tested: 0,
+  s2_tested: 0,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= STAGE 1: VISUAL MODEL (TESTING A TRUE CLAIM) ================= */
+const S1_PAIRS = [[3,5],[7,9],[11,13],[15,17]];
+function renderStage1(){
+  const tested = state.s1_tested;
+  const done = tested >= S1_PAIRS.length;
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — The Inspector's Testing Log</div>
+    <h2>Claim: "The sum of two odd numbers is always even."</h2>
+    <p>Before an inspector signs off on ANY rule, they test it against real cases. Test one pair at a time and log the result.</p>
+    <div class="blueprint-box">
+      ${S1_PAIRS.slice(0,tested).map(([a,b])=>`
+        <div class="logentry"><span>${a} + ${b} = ${a+b}</span><span class="verdict">✅ EVEN</span></div>
+      `).join('')}
+      ${!done
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="testNext1()">🔍 Test pair ${tested+1}: ${S1_PAIRS[tested][0]} + ${S1_PAIRS[tested][1]}</button></div>`
+        : `<div class="step1banner">🏁 All 4 tests passed. Tempting to call this "ALWAYS TRUE" right now — but hold that thought. Stage 2 has a warning about trusting examples alone.</div>`}
+    </div>
+  </div>`;
+}
+function testNext1(){ state.s1_tested++; save(); render(); }
+
+/* ================= STAGE 2: MENTAL STRATEGY (THE COUNTEREXAMPLE TRAP) ================= */
+const S2_PRIMES = [3,5,7,11,2];
+function renderStage2(){
+  const tested = state.s2_tested;
+  const done = tested >= S2_PRIMES.length;
+  const justBroke = done && S2_PRIMES[tested-1] === 2;
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — The Counterexample Trap</div>
+    <h2>Claim: "All prime numbers are odd."</h2>
+    <p>Test it the same way as before — one prime at a time. See if the pattern really holds forever, or if it's hiding an exception.</p>
+    <div class="blueprint-box">
+      ${S2_PRIMES.slice(0,tested).map(p=>{
+        const isOdd = p%2!==0;
+        return `<div class="logentry ${isOdd?'':'broken'}"><span>Test ${p}</span><span class="verdict">${isOdd?'✅ odd':'⚠️ EVEN — breaks the claim!'}</span></div>`;
+      }).join('')}
+      ${!done
+        ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="testNext2()">🔍 Test the next prime: ${S2_PRIMES[tested]}</button></div>`
+        : `<div class="step1banner">🏁 Four primes in a row looked convincing — then ONE counterexample (2) broke the whole claim. That's the trap: no number of confirming examples can ever PROVE "always." One failure is all it takes to disprove it.</div>`}
+    </div>
+  </div>`;
+}
+function testNext2(){ state.s2_tested++; save(); render(); }
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Inspector's Classification</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard">
+      <div class="big"><span class="n">ALWAYS</span>: true for every case (needs a proof).<br><span class="n">NEVER</span>: false for every case (needs a proof).<br><span class="n">SOMETIMES</span>: true for some, false for others (needs ONE example of each).</div>
+    </div>
+    <table class="divtable">
+      <tr><td>Disprove ALWAYS</td><td>Just ONE counterexample is enough</td></tr>
+      <tr><td>Prove ALWAYS</td><td>Needs reasoning that covers EVERY case</td></tr>
+      <tr><td>Prove NEVER</td><td>Needs reasoning that rules out EVERY case</td></tr>
+    </table>
+    <div class="step1banner">🧠 Memory hook: examples can only ever BREAK an "always" claim — they can never fully PROVE one. Proving "always" needs a reason that works for every number at once, not a longer list of tests.</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — Proofs You've Already Built</div>
+    <h2>You've been proving things all along</h2>
+    <p>Look back through your logbook — you've already written real ALWAYS and NEVER proofs, without calling them that:</p>
+    <div class="faq">
+      <div class="q">Module 10: "Odd + odd = even"</div>
+      <div class="a">You proved this with algebra: odd = 2k+1, and adding two of them always produces a multiple of 2. That covers EVERY odd number at once — not just the ones you tested.</div>
+    </div>
+    <div class="faq">
+      <div class="q">Module 13: "6x+9y can never equal 20"</div>
+      <div class="a">You proved this using the GCF — since GCF(6,9)=3 doesn't divide 20, NO combination could ever work. That's a full NEVER proof, not just a failed search.</div>
+    </div>
+    <p><b>The difference that matters:</b> testing examples (like Stage 1 and Stage 2) is how you FIND a pattern and get a hunch. Algebra and reasoning (like 2k+1, or GCF arguments) is how you PROVE the pattern holds for numbers you'll never get around to testing by hand.</p>
+    <div class="faq">
+      <div class="q">So are examples useless?</div>
+      <div class="a">Not at all! Examples are how you discover a pattern worth trying to prove, and how you catch FALSE claims fast (one counterexample is enough). You just can't use them alone to confirm a TRUE "always" claim.</div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE ================= */
+function renderVisual(v){
+  if(v.type==='list'){
+    return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`<div class="pairrow">${r}</div>`).join('')}</div></div>`;
+  }
+  if(v.type==='verdict'){
+    return `<div class="blueprint-box"><div class="verdictbox ${v.kind}">${v.text}</div></div>`;
+  }
+  return '';
+}
+
+const BOSS_DATA = {
+  1: {
+    tag: 'CASE 1 · RMS TITANIC', title: 'The Compartment Rule',
+    text: 'Claim: "Every compartment number that\u2019s a multiple of 6 is also a multiple of 3." Classify it: Always, Sometimes, or Never?',
+    steps: [
+      { text:'Step 1: Test a few multiples of 6.', visual:{type:'list', rows:['6 &divide; 3 = 2 ✓', '12 &divide; 3 = 4 ✓', '18 &divide; 3 = 6 ✓']} },
+      { text:'Step 2: Every test passes \u2014 but remember, examples alone can\u2019t prove ALWAYS. Look for the reasoning: 6k = 3&times;(2k) for any whole number k.' },
+      { text:'Answer: ALWAYS TRUE.', visual:{type:'verdict', kind:'always', text:'✅ ALWAYS \u2014 6k always equals 3 times a whole number (2k), so it\u2019s automatically a multiple of 3, no matter what k is.'} }
+    ]
+  },
+  2: {
+    tag: "CASE 2 · SHIP'S LAB", title: 'The Prime Sum Rule',
+    text: 'Claim: "The sum of two prime numbers is even." Classify it: Always, Sometimes, or Never?',
+    steps: [
+      { text:'Step 1: Test with two odd primes.', visual:{type:'list', rows:['3 + 5 = 8 \u2014 EVEN ✓']} },
+      { text:'Step 2: Now test with the exception from Stage 2\u2019s trap \u2014 the prime 2.', visual:{type:'list', rows:['2 + 3 = 5 \u2014 ODD ✗']} },
+      { text:'Answer: SOMETIMES TRUE.', visual:{type:'verdict', kind:'sometimes', text:'\u26A0\uFE0F SOMETIMES \u2014 true when both primes are odd (odd+odd=even), false whenever 2 is one of them (even+odd=odd).'} }
+    ]
+  },
+  3: {
+    tag: 'CASE 3 · WARP PIPE WORKSHOP', title: "Mario's Even Prime Hunt",
+    text: 'Claim: "There is an even prime number bigger than 2." Classify it: Always, Sometimes, or Never?',
+    steps: [
+      { text:'Step 1: Test a few even numbers bigger than 2 for primality.', visual:{type:'list', rows:['4: factors 1,2,4 \u2014 not prime', '6: factors 1,2,3,6 \u2014 not prime', '8: factors 1,2,4,8 \u2014 not prime']} },
+      { text:'Step 2: Look for the reasoning: ANY even number bigger than 2 can always be split as 2 &times; (n&divide;2), and n&divide;2 is a whole number bigger than 1 \u2014 that\u2019s a third factor, guaranteed.' },
+      { text:'Answer: NEVER TRUE.', visual:{type:'verdict', kind:'never', text:'\u26A0\uFE0F NEVER \u2014 every even number bigger than 2 automatically has at least 3 factors (1, 2, and itself), so it can never be prime. 2 is the ONLY even prime, always.'} }
+    ]
+  }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${data.steps[i].visual ? renderVisual(data.steps[i].visual) : ''}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: Try the formula n\u00b2+n+41 for n=0,1,2,3... it gives 41, 43, 47, 53... all prime!",
+  "Step 2: Keep testing \u2014 it stays prime all the way through n=39. That's FORTY confirming examples in a row.",
+  "Step 3: Try n=40: 40\u00b2+40+41 = 1600+40+41 = 1681.",
+  "Answer: 1681 = 41 &times; 41 \u2014 NOT prime! Forty perfect examples in a row, and it still wasn't \u201calways.\u201d This is one of the most famous examples in all of mathematics for why testing isn't proving."
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>The 40-Example Trap:</b> Is n&sup2;+n+41 always prime?</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on Proof.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>
