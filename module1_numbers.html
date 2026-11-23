@@ -153,6 +153,29 @@
   .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
 
   .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+
+  /* ---- Story Hook (pilot) ---- */
+  .hook{ border:2px dashed var(--accent-brass); }
+  .hook .hstep{ background:var(--bg-paper); border-radius:12px; padding:12px; margin:10px 0; }
+  .hook .hstep p{ margin:0 0 8px; font-size:14.5px; }
+  .hook .hnote{ background:var(--accent-brass-light); color:#5C3E1B; font-weight:700; }
+  .hook .hsvg{ width:100%; max-width:340px; display:block; margin:6px auto 0; }
+  .hook .hcap{ font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); text-align:center; margin-top:4px; }
+  .hook .hdots{ display:flex; gap:6px; justify-content:center; margin:6px 0; }
+  .hook .hdots span{ width:10px; height:10px; border-radius:50%; background:var(--bg-paper-alt); }
+  .hook .hdots span.on{ background:var(--success); }
+  .hook .zrow{ display:flex; align-items:center; gap:10px; margin:8px 0; font-size:13px; }
+  .hook .zrow .zl{ flex:1; min-width:0; }
+  .hook .zbox{ width:120px; height:22px; border:2px solid var(--success-dark); border-radius:4px; background:var(--success); position:relative; flex-shrink:0; overflow:hidden; }
+  .hook .zbox i{ position:absolute; left:0; top:0; bottom:0; background:var(--alert); }
+  .hook .skip{ background:none; border:none; color:var(--text-ink-soft); text-decoration:underline; font-family:inherit; font-size:12.5px; min-height:44px; cursor:pointer; touch-action:manipulation; }
+  /* ---- Name tags: why each number family has its name ---- */
+  .nametag{ background:var(--accent-brass-light); color:#3B2810; border-radius:12px; padding:12px 14px; margin:12px 0 4px; text-align:left; border:2px solid var(--accent-brass); }
+  .nametag .nt-h{ font-family:'Space Mono',monospace; font-weight:700; font-size:13px; letter-spacing:.5px; margin-bottom:6px; }
+  .nametag p{ margin:0 0 6px; font-family:'Quicksand',sans-serif; font-size:14px; line-height:1.5; color:#3B2810; }
+  .nametag .nt-ex{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+  .nametag .nt-ex span{ background:#fff; border-radius:16px; padding:4px 10px; font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; color:#0F3652; }
+  .nametag .nt-eng{ font-weight:700; margin-bottom:0; }
 </style>
 </head>
 <body>
@@ -198,7 +221,22 @@ function saveState(obj){
   catch(e){ storageBlocked = true; memoryFallback = obj; }
 }
 
-let state = loadState() || {
+
+// Safe merge: saved progress always wins, but any field added in a later update
+// gets its default instead of "undefined". (Never remove: protects J.J.'s saved progress.)
+function mergeState(defaults, saved){
+  const base = JSON.parse(JSON.stringify(defaults));
+  if(!saved || typeof saved !== 'object' || Array.isArray(saved)) return base;
+  const out = Object.assign({}, base, saved);
+  if(base.boss_reveal && saved.boss_reveal && typeof saved.boss_reveal === 'object'){
+    out.boss_reveal = Object.assign({}, base.boss_reveal, saved.boss_reveal);
+  }
+  const c = Array.isArray(saved.completed) ? saved.completed : [];
+  out.completed = [0,1,2,3,4].map(i => !!c[i]);
+  return out;
+}
+
+const DEFAULT_STATE = {
   stage: 0,
   completed: [false,false,false,false,false],
   s1_layer: 0,
@@ -207,6 +245,7 @@ let state = loadState() || {
   boss_reveal: {1:0, 2:0, 3:0},
   bonus_reveal: 0
 };
+let state = mergeState(DEFAULT_STATE, loadState());
 function save(){ saveState(state); }
 
 /* ================= NAV ================= */
@@ -251,11 +290,85 @@ function renderStage1(){
     <div class="blueprint-box">
       ${buildNested(idx)}
       <div class="factorlist" style="margin-top:10px">${LAYERS[idx].desc}</div>
+      ${renderNameTag(idx)}
       ${!done
         ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="openNext1()">📦 Open the next hold: ${LAYERS[idx+1].name}</button></div>`
         : `<div class="step1banner">🏁 All holds open! Notice: every Natural number is also Whole, Integer, Rational, AND Real — the categories nest inside each other, they never separate.</div>`}
     </div>
+  </div>
+  ${renderHook(idx)}`;
+}
+
+/* ================= STORY HOOK (pilot): picture-stories before the blunt explanation ================= */
+let hookStep = { r:0, i:0 };
+function pieceBar(n, shaded){
+  const w = 280 / n; let r = '';
+  for(let k=0;k<n;k++) r += `<rect x="${10+k*w}" y="8" width="${w-3}" height="34" rx="4" fill="${k<shaded?'#4C9A8B':'#fff'}" stroke="#0F3652" stroke-width="2"/>`;
+  return `<svg class="hsvg" viewBox="0 0 300 50" role="img" aria-label="${shaded} of ${n} equal ice pieces shaded">${r}</svg>`;
+}
+function brickRow(n){
+  let r=''; for(let k=0;k<n;k++) r += `<rect x="${12+k*56}" y="8" width="50" height="34" rx="4" fill="#BFE3F0" stroke="#0F3652" stroke-width="2"/><text x="${37+k*56}" y="31" text-anchor="middle" font-family="Space Mono,monospace" font-size="13" fill="#0F3652">1</text>`;
+  return `<svg class="hsvg" viewBox="0 0 300 50" role="img" aria-label="${n} whole ice bricks">${r}</svg>`;
+}
+function diagSvg(){
+  return `<svg class="hsvg" viewBox="0 0 200 140" role="img" aria-label="A square ice floor 1 by 1 with a beam across the corner">
+    <rect x="50" y="15" width="100" height="100" fill="#BFE3F0" stroke="#0F3652" stroke-width="2.5"/>
+    <line x1="50" y1="115" x2="150" y2="15" stroke="#E0A458" stroke-width="5" stroke-linecap="round"/>
+    <text x="100" y="132" text-anchor="middle" font-family="Space Mono,monospace" font-size="13" fill="#0F3652">1 brick</text>
+    <text x="38" y="70" text-anchor="end" font-family="Space Mono,monospace" font-size="13" fill="#0F3652">1</text>
+    <text x="118" y="58" font-family="Space Mono,monospace" font-size="14" font-weight="700" fill="#8F6636" transform="rotate(-45 118 58)">&#8730;2 = ?</text></svg>`;
+}
+function sliverRows(){
+  return [10,100,1000].map(n => {
+    const x = Math.SQRT2 * n, k = Math.floor(x), frac = x - k;
+    return `<div class="zrow"><div class="zl"><b>Pieces of 1/${n}:</b> ${k.toLocaleString('en-US')} fit.<br>Sliver left: about ${Math.round(frac*100)}% of one piece.</div>
+      <div class="zbox" title="zoom on the last piece"><i style="width:${Math.round((1-frac)*100)}%;background:#4C9A8B"></i><i style="left:${Math.round((1-frac)*100)}%;right:0;background:#E0A458"></i></div></div>`;
+  }).join('') + '<div class="hcap">zoom on the last piece: green = fits, amber = sliver left</div>';
+}
+const HOOKS = {
+  r: { title:'The Ice Palace Beam', steps:[
+    { text:'❄️ An ice-palace builder cuts every beam from <b>equal ice pieces</b>. Today she needs a beam that is <b>3 pieces</b> long, out of a brick cut into <b>4 equal pieces</b>.', vis:()=>pieceBar(4,3)+'<div class="hcap">3 pieces out of 4 equal pieces = 3/4</div>' },
+    { text:'Same beam, written as a decimal: <b>0.75</b>. It is just 75 hundredths &mdash; still counted in equal pieces! And 5 whole bricks? Each brick is 1 piece: <b>5 = 5/1</b>.', vis:()=>brickRow(5)+'<div class="hcap">0.75 = 75/100 = 3/4 &nbsp;&middot;&nbsp; 5 = 5/1</div>' },
+    { note:true, text:'🔧 <b>Engineer&rsquo;s Note:</b> Rational has <b>RATIO</b> inside it! If you can count it in equal pieces &mdash; a whole number of pieces over a whole number of pieces &mdash; it is <b>Rational</b>.' }
+  ]},
+  i: { title:'The Beam That Never Fits', steps:[
+    { text:'❄️ Now the builder lays a beam <b>corner to corner</b> across a square ice floor, 1 brick by 1 brick. How long is that beam? Engineers call it <b>&radic;2</b>.', vis:()=>diagSvg() },
+    { text:'She tries to measure it in equal pieces. Smaller and smaller pieces... but there is <b>always a sliver left</b>:', vis:()=>sliverRows() },
+    { note:true, text:'🔧 <b>Engineer&rsquo;s Note:</b> <b>Irrational = NO ratio.</b> No matter how small your pieces, a sliver is always left. Mathematicians have <b>proven</b> it never ends. Real numbers = Rational + Irrational.' }
+  ]}
+};
+function renderHook(idx){
+  const kind = idx===3 ? 'r' : idx===4 ? 'i' : null;
+  if(!kind) return '';
+  const H = HOOKS[kind], at = hookStep[kind], total = H.steps.length;
+  if(at === -1) return `<div class="panel hook" id="hook"><div class="tag">🎬 Story Hook</div><p style="margin:4px 0">Story skipped. <button class="skip" onclick="hookGo('${kind}',0)">Watch it after all</button></p></div>`;
+  let body = '';
+  for(let k=0;k<=Math.min(at,total-1);k++){
+    const st = H.steps[k];
+    body += `<div class="hstep ${st.note?'hnote':''}"><p>${st.text}</p>${st.vis ? st.vis() : ''}</div>`;
+  }
+  const dots = H.steps.map((_,k)=>`<span class="${k<=at?'on':''}"></span>`).join('');
+  const more = at < total-1;
+  return `<div class="panel hook" id="hook">
+    <div class="tag">🎬 Story Hook &mdash; ${H.title}</div>
+    <div class="hdots">${dots}</div>${body}
+    ${more ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="hookGo('${kind}',${at+1})">Next ▶ (${at+2} of ${total})</button></div>
+              <div style="text-align:center"><button class="skip" onclick="hookGo('${kind}',-1)">Skip the story</button></div>` : ''}
   </div>`;
+}
+function hookGo(kind, n){ hookStep[kind] = n; render(); const el = document.getElementById('hook'); if(el && el.scrollIntoView) el.scrollIntoView({block:'nearest', behavior:'smooth'}); }
+
+/* ===== NAME TAGS: the story behind each word (shown for the hold that was just opened) ===== */
+const NAMETAGS = [
+  { word:'NATURAL', why:'These are the numbers you <b>count with</b>. People counted crates and sheep long before anything else, so counting numbers feel <b>natural</b>.', ex:['1','2','3','42'], eng:'Natural = natural counting.' },
+  { word:'WHOLE', why:'Natural numbers <b>plus 0</b>. Zero is special: <b>(1)</b> it means &ldquo;none counted&rdquo;, so counting can start from it. <b>(2)</b> It holds a place: without 0, 205 would look like 25. <b>(3)</b> Adding it changes nothing: 7 + 0 = 7. <b>Careful:</b> you can never divide by 0!', ex:['0','1','2','100'], eng:'In Cambridge &amp; Singapore maths, 0 is Whole but NOT Natural.' },
+  { word:'INTEGER', why:'Whole numbers <b>plus their negatives</b>. The word means &ldquo;untouched&rdquo; in Latin: no fraction pieces, only complete steps up or down the number line.', ex:['-5','0','12','-12'], eng:'Integer = complete steps, no pieces.' },
+  { word:'RATIONAL', why:'Rational has <b>RATIO</b> hiding inside it! It does <b>not</b> mean &ldquo;reasonable&rdquo;. If you can write it as <b>a whole number over a whole number</b>, it is Rational.', ex:['3/4','0.75 = 75/100','5 = 5/1','0.333&hellip; = 1/3'], eng:'Even a decimal that repeats forever is Rational, because it is still a ratio.' },
+  { word:'IRRATIONAL &amp; REAL', why:'<b>ir-</b> means <b>not</b>. Irrational = <b>not a ratio</b>. Measure it in smaller and smaller equal pieces and a sliver is <b>always</b> left. Its decimal never ends and never repeats. This was <b>proven</b> over 2,000 years ago. <b>Real</b> = every point on the number line: Rational + Irrational together.', ex:['&radic;2 = 1.41421&hellip;','&pi; = 3.14159&hellip;'], eng:'22/7 and 3.14 are only close to &pi;, never exactly it.' }
+];
+function renderNameTag(idx){
+  const t = NAMETAGS[idx]; if(!t) return '';
+  return `<div class="nametag"><div class="nt-h">🏷️ NAME TAG &mdash; ${t.word}</div><p>${t.why}</p><div class="nt-ex">${t.ex.map(e=>`<span>${e}</span>`).join('')}</div><p class="nt-eng">🔧 ${t.eng}</p></div>`;
 }
 function openNext1(){ if(state.s1_layer < LAYERS.length-1) state.s1_layer++; save(); render(); }
 

@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>J.J.'s Engineering Academy</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Engineering Academy">
+<meta name="description" content="Fleet Command — launch pad and progress backup for J.J.&#39;s training apps.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #F1ECDD;
+  --card: #FFFFFF;
+  --ink: #16293A;
+  --ink-soft: #5B6B78;
+  --teal: #0E2A45;
+  --teal-dark: #081826;
+  --amber: #D9A441;
+  --amber-dark: #B3822C;
+  --coral: #C1503A;
+  --success: #3FA37A;
+  --success-bg: #E6F5EE;
+  --nudge-bg: #FCEFD9;
+  --nudge-ink: #8A5A18;
+  --danger: #C0392B;
+  --danger-bg: #FBEAE7;
+  --mono: 'Space Mono', 'Courier New', monospace;
+}
+
+* { box-sizing: border-box; }
+html, body, #app { min-height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(14,42,69,0.035) 0px, rgba(14,42,69,0.035) 1px, transparent 1px, transparent 28px),
+    repeating-linear-gradient(90deg, rgba(14,42,69,0.035) 0px, rgba(14,42,69,0.035) 1px, transparent 1px, transparent 28px);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+button, input { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+
+.wrap { max-width: 560px; margin: 0 auto; padding-bottom: 40px; }
+
+/* ---- Header ---- */
+.hdr {
+  background: var(--teal); color: #fff; padding: 22px 20px 20px;
+  border-bottom: 3px solid var(--amber); text-align: center;
+}
+.hdr-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); }
+.hdr-title { font-family: var(--mono); font-weight: 700; font-size: 23px; margin-top: 6px; letter-spacing: 0.01em; }
+.hdr-sub { color: rgba(255,255,255,0.72); font-size: 13px; margin-top: 6px; }
+
+/* ---- Sections ---- */
+.section { padding: 18px 16px 0; }
+.section-label {
+  font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px;
+}
+
+/* ---- Captain's Wild Card ---- */
+.wild-card {
+  background: var(--teal); color: #fff; border-radius: 10px; padding: 16px; text-align: center;
+  border: 2px dashed var(--amber); box-shadow: 0 3px 12px rgba(14,42,69,0.18);
+}
+.wild-face {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(217,164,65,0.45); border-radius: 10px;
+  padding: 18px 12px; min-height: 140px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+}
+.wild-emoji { font-size: 44px; line-height: 1; }
+.wild-name { font-family: var(--mono); font-weight: 700; font-size: 17px; color: #fff; }
+.wild-step { font-size: 13.5px; color: rgba(255,255,255,0.85); line-height: 1.5; max-width: 420px; }
+.wild-face.shuffling .wild-emoji { animation: wild-wobble 0.22s infinite alternate; }
+.wild-face.landed { animation: wild-pop 0.45s ease; border-color: var(--amber); }
+@keyframes wild-wobble { from { transform: rotate(-9deg) scale(1); } to { transform: rotate(9deg) scale(1.12); } }
+@keyframes wild-pop { 0% { transform: scale(0.88); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
+.wild-btn {
+  display: block; width: 100%; margin-top: 12px; padding: 14px; border-radius: 8px; border: none;
+  background: var(--amber); color: var(--teal-dark); font-weight: 700; font-size: 16px;
+  cursor: pointer; text-align: center; letter-spacing: 0.01em;
+}
+.wild-btn:active { opacity: 0.9; transform: scale(0.99); }
+.wild-btn.go { background: var(--success); color: #fff; }
+.wild-swap {
+  display: block; width: 100%; margin-top: 10px; padding: 10px; border-radius: 8px; cursor: pointer;
+  background: transparent; border: 2px solid rgba(255,255,255,0.4); color: #fff; font-weight: 600; font-size: 13.5px;
+}
+.wild-note { font-family: var(--mono); font-size: 11px; color: var(--amber); margin-top: 10px; line-height: 1.5; min-height: 16px; }
+.wild-btn[hidden], .wild-swap[hidden], .wild-actions[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .wild-face.shuffling .wild-emoji, .wild-face.landed { animation: none; }
+}
+
+/* ---- Voyage progress ---- */
+.voyage-card {
+  background: var(--teal); color: #fff; border-radius: 10px; padding: 14px 16px;
+  border: 2px dashed var(--amber); box-shadow: 0 3px 12px rgba(14,42,69,0.18);
+}
+.voyage-row { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; }
+.voyage-row .num { font-size: 13px; color: var(--amber); font-weight: 700; }
+.voyage-track { height: 10px; background: rgba(255,255,255,0.18); border-radius: 6px; overflow: hidden; margin-top: 8px; }
+.voyage-fill { height: 100%; background: linear-gradient(90deg, var(--amber), #fff); border-radius: 6px; transition: width .4s ease; }
+
+/* ---- Mission cards ---- */
+.missions { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+.mission-card {
+  background: var(--card); border-radius: 10px; padding: 16px;
+  box-shadow: 0 2px 10px rgba(14,42,69,0.10); border: 1px solid rgba(14,42,69,0.10);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.mission-top { display: flex; gap: 12px; align-items: flex-start; }
+.mission-emoji {
+  font-size: 26px; width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center;
+  justify-content: center; background: var(--bg); border-radius: 8px; border: 1px dashed var(--amber-dark);
+}
+.mission-info { flex: 1; min-width: 0; }
+.mission-name { font-family: var(--mono); font-weight: 700; font-size: 16px; color: var(--teal); }
+.mission-desc { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+.mission-stats {
+  display: flex; gap: 10px; flex-wrap: wrap; font-family: var(--mono); font-size: 11px;
+  color: var(--ink-soft); background: var(--bg); border-radius: 6px; padding: 8px 10px;
+}
+.mission-stats .stat strong { color: var(--teal); }
+.mission-stats.is-empty { font-style: normal; color: var(--ink-soft); }
+.mission-btn {
+  display: block; text-align: center; background: var(--teal); color: #fff; font-weight: 700;
+  font-size: 14px; padding: 11px; border-radius: 8px; letter-spacing: 0.01em;
+}
+.mission-btn:active { opacity: 0.9; }
+.mission-external-badge {
+  font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--amber-dark); background: var(--nudge-bg);
+  border: 1px dashed var(--amber-dark); border-radius: 5px; padding: 4px 8px; display: inline-block;
+}
+
+/* ---- Ship's log (backup/restore) ---- */
+.log-card {
+  background: var(--card); border-radius: 10px; padding: 16px; margin-top: 14px;
+  box-shadow: 0 2px 10px rgba(14,42,69,0.10); border: 1px solid rgba(14,42,69,0.10);
+}
+.log-title { font-family: var(--mono); font-weight: 700; font-size: 15px; color: var(--teal); }
+.log-desc { font-size: 12.5px; color: var(--ink-soft); margin-top: 4px; line-height: 1.5; }
+.log-btn-row { display: flex; gap: 10px; margin-top: 14px; }
+.log-link {
+  background: none; border: none; padding: 0 2px; min-height: 44px; margin-top: 4px; cursor: pointer;
+  color: var(--ink-soft); font-size: 12.5px; text-decoration: underline;
+}
+.log-link[hidden] { display: none; }
+.log-btn {
+  flex: 1; padding: 11px; border-radius: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer;
+  border: 2px solid var(--teal); background: transparent; color: var(--teal); text-align: center;
+}
+.log-btn.primary { background: var(--teal); color: #fff; }
+/* the real file picker stays in the page (so the label still opens it on iPad) but is invisible */
+.log-btn-row input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+.log-btn-row { position: relative; }
+.log-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); margin-top: 10px; }
+.log-status { margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; display: none; }
+.log-status.show { display: block; }
+.log-status.ok { background: var(--success-bg); color: #1e5c40; border: 1px solid rgba(63,163,122,0.3); }
+.log-status.warn { background: var(--nudge-bg); color: var(--nudge-ink); border: 1px dashed var(--amber-dark); }
+.log-status.err { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(192,57,43,0.3); }
+
+/* ---- Import preview ---- */
+.preview-box {
+  margin-top: 12px; background: var(--bg); border-radius: 8px; padding: 12px; border: 1px dashed var(--amber-dark);
+  display: none;
+}
+.preview-box.show { display: block; }
+.preview-title { font-family: var(--mono); font-weight: 700; font-size: 12.5px; color: var(--teal); margin-bottom: 8px; }
+.preview-row { font-size: 12.5px; color: var(--ink); padding: 4px 0; border-top: 1px solid rgba(14,42,69,0.08); }
+.preview-row:first-of-type { border-top: none; }
+.preview-actions { display: flex; gap: 10px; margin-top: 12px; }
+
+/* ---- Shipyard (flagship built from the on-site decks) ---- */
+.ship-card {
+  background: var(--teal); color: #fff; border-radius: 10px; padding: 16px;
+  border: 2px dashed var(--amber); box-shadow: 0 3px 12px rgba(14,42,69,0.18);
+}
+.ship-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); }
+.ship-name { font-family: var(--mono); font-weight: 700; font-size: 20px; margin: 6px 0 10px; word-break: break-word; }
+.ship-nameform { display: flex; gap: 8px; margin-bottom: 12px; }
+.ship-nameform input {
+  flex: 1; min-width: 0; min-height: 44px; padding: 8px 12px; border-radius: 8px; font-size: 15px;
+  border: 2px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.08); color: #fff;
+}
+.ship-nameform input::placeholder { color: rgba(255,255,255,0.55); }
+.ship-nameform button {
+  min-height: 44px; padding: 0 16px; border-radius: 8px; border: none; cursor: pointer;
+  background: var(--amber); color: var(--teal-dark); font-weight: 700; font-size: 14px;
+}
+.ship-svg { width: 100%; height: auto; display: block; border-radius: 8px; }
+.ship-svg .hs-built .k1 { fill: #8A5A18; } .ship-svg .hs-built .k2 { fill: #D9A441; }
+.ship-svg .hs-built .h1 { fill: #B9C6D1; } .ship-svg .hs-built .h2 { fill: #C1503A; } .ship-svg .hs-built .h3 { fill: #5B6B78; }
+.ship-svg .hs-built .e0 { fill: #16293A; stroke: #D9A441; stroke-width: 1.5; } .ship-svg .hs-built .e1 { fill: #D9A441; }
+.ship-svg .hs-built .p1 { fill: #D9A441; } .ship-svg .hs-built .p2 { fill: #8A5A18; }
+.ship-svg .hs-built .d1 { fill: #F1ECDD; } .ship-svg .hs-built .d2 { fill: #0E2A45; }
+.ship-svg .hs-built .f1 { fill: #C1503A; } .ship-svg .hs-built .f2 { fill: #16293A; } .ship-svg .hs-built .f3 { fill: #D9A441; }
+.ship-svg .hs-built .b1 { fill: #F1ECDD; } .ship-svg .hs-built .b2 { fill: #C1503A; } .ship-svg .hs-built .b3 { fill: #0E2A45; }
+.ship-svg .hs-built .m1 { fill: #F1ECDD; } .ship-svg .hs-built .m2 { fill: #C1503A; } .ship-svg .hs-built .m3 { fill: #D9A441; }
+.ship-svg .hs-outline * { fill: none; stroke: #D9A441; stroke-width: 1; stroke-dasharray: 4 3; opacity: 0.7; }
+.ship-meter { height: 10px; background: rgba(255,255,255,0.18); border-radius: 6px; overflow: hidden; margin-top: 12px; }
+.ship-meter-fill { height: 100%; background: linear-gradient(90deg, var(--amber), #fff); border-radius: 6px; transition: width .4s ease; }
+.ship-meter-text { font-family: var(--mono); font-size: 11.5px; color: var(--amber); margin: 8px 0 0; line-height: 1.5; }
+.ship-next {
+  display: block; margin-top: 12px; padding: 14px; border-radius: 8px; text-align: center;
+  background: var(--success); color: #fff; font-weight: 700; font-size: 15px;
+}
+.ship-next:active { opacity: 0.9; transform: scale(0.99); }
+.ship-launch {
+  margin-top: 12px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 700;
+  background: var(--success-bg); color: #1e5c40;
+}
+.ship-parts { margin-top: 12px; }
+.ship-parts summary { cursor: pointer; font-family: var(--mono); font-size: 12px; color: var(--amber); padding: 10px 0; min-height: 44px; }
+.ship-chips { display: flex; flex-direction: column; gap: 8px; }
+.ship-chip {
+  display: block; padding: 10px 12px; border-radius: 8px; font-size: 13px; line-height: 1.4;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(217,164,65,0.35); color: #fff;
+}
+.ship-chip.done { background: rgba(63,163,122,0.22); border-color: rgba(63,163,122,0.6); }
+.ship-chip small { display: block; color: rgba(255,255,255,0.7); font-family: var(--mono); font-size: 11px; }
+
+/* ---- Phase 2: ship preview, visits, nudge, fleet ---- */
+.ship-svg .hs-preview { opacity: 1; animation: hs-pulse 1.3s ease-in-out infinite alternate; }
+.ship-svg .hs-preview * { stroke: #FFD27A; stroke-width: 1.4; }
+@keyframes hs-pulse { from { opacity: 0.5; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ship-svg .hs-preview { animation: none; opacity: 0.85; } }
+.ship-pick-label { font-family: var(--mono); font-size: 11.5px; color: var(--amber); margin: 14px 0 8px; }
+.ship-decks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ship-deck-btn {
+  min-height: 44px; padding: 8px 10px; border-radius: 8px; cursor: pointer; text-align: left;
+  background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.25); color: #fff; font-size: 13px; font-weight: 600;
+}
+.ship-deck-btn small { display: block; font-family: var(--mono); font-weight: 400; font-size: 10.5px; color: rgba(255,255,255,0.7); }
+.ship-deck-btn[aria-pressed="true"] { border-color: var(--amber); background: rgba(217,164,65,0.22); }
+.ship-goal { font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,0.92); margin: 12px 0 0; min-height: 42px; }
+.ship-goal strong { color: var(--amber); }
+.mission-visits { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); padding: 0 2px; }
+.nudge-card {
+  background: var(--nudge-bg); color: var(--nudge-ink); border-radius: 10px; padding: 14px 16px;
+  border: 2px dashed var(--amber-dark); line-height: 1.5; font-size: 13.5px;
+}
+.nudge-card strong { color: var(--ink); }
+.nudge-actions { display: flex; gap: 10px; margin-top: 12px; }
+.nudge-go {
+  flex: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center;
+  background: var(--teal); color: #fff; font-weight: 700; font-size: 14px; border-radius: 8px; padding: 8px 12px;
+}
+.nudge-skip {
+  min-height: 44px; padding: 0 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px;
+  background: transparent; border: 2px solid var(--amber-dark); color: var(--nudge-ink);
+}
+.fleet { display: flex; flex-direction: column; gap: 12px; }
+.fleet-card {
+  display: flex; gap: 12px; align-items: center; background: var(--card); border-radius: 10px; padding: 12px;
+  box-shadow: 0 2px 10px rgba(14,42,69,0.10); border: 1px solid rgba(14,42,69,0.10); min-height: 44px;
+}
+.fleet-ship { width: 112px; flex-shrink: 0; height: auto; background: var(--bg); border-radius: 8px; border: 1px dashed var(--amber-dark); }
+.fleet-name { font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--teal); }
+.fleet-sub { font-size: 12px; color: var(--ink-soft); margin-top: 3px; line-height: 1.45; }
+.fleet-card .mission-visits { margin-top: 6px; display: block; }
+
+/* ---- Footer note ---- */
+.foot-note {
+  margin: 18px 16px 0; font-size: 11.5px; color: var(--ink-soft); text-align: center; line-height: 1.6;
+}
+.foot-note code { font-family: var(--mono); background: var(--card); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(14,42,69,0.1); }
+
+/* ---- Number Theory sync: banner, paste box, fleet ship ---- */
+.sync-banner { margin: 14px 16px 0; padding: 12px 14px; border-radius: 10px; font-size: 13.5px; line-height: 1.5; cursor: pointer;
+  background: var(--success-bg); color: #1e5c40; border: 2px solid rgba(63,163,122,0.5); }
+.sync-banner.err { background: var(--danger-bg); color: var(--danger); border-color: rgba(192,57,43,0.4); }
+.sync-banner[hidden] { display: none; }
+.sync-banner small { display: block; margin-top: 4px; opacity: 0.8; }
+.nts-paste { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.nts-paste-label { width: 100%; font-family: var(--mono); font-size: 11px; color: var(--ink-soft); }
+.nts-paste input {
+  flex: 1; min-width: 0; min-height: 44px; padding: 8px 10px; border-radius: 8px; font-size: 16px; letter-spacing: 0.06em;
+  font-family: var(--mono); text-transform: uppercase; border: 2px solid rgba(14,42,69,0.25); background: #fff; color: var(--ink);
+  -webkit-user-select: text; user-select: text;
+}
+.nts-paste button {
+  min-height: 44px; padding: 0 14px; border-radius: 8px; border: 2px solid var(--teal); background: transparent; color: var(--teal);
+  font-weight: 700; font-size: 13.5px; cursor: pointer; touch-action: manipulation;
+}
+.nts-msg { width: 100%; font-size: 12.5px; line-height: 1.5; min-height: 0; }
+.nts-msg.err { color: var(--danger); } .nts-msg.ok { color: #1e5c40; }
+.fleet-ship.wide { width: 150px; }
+.fleet-ship .nts-o * { fill: none; stroke: #B3822C; stroke-width: 1; stroke-dasharray: 4 3; opacity: 0.75; }
+</style>
+</head>
+<body>
+<div id="app" class="wrap">
+
+  <div class="hdr">
+    <div class="hdr-eyebrow">RMS Design Files · Fleet Command</div>
+    <div class="hdr-title">⚓ J.J.'s Engineering Academy</div>
+    <div class="hdr-sub">Step 1 beats perfection — pick a training deck and start.</div>
+  </div>
+  <div class="sync-banner" id="sync-banner" role="status" hidden></div>
+
+  <div class="section">
+    <div class="section-label">🎴 Captain's Wild Card</div>
+    <div class="wild-card">
+      <div class="wild-face" id="wild-face" aria-live="polite">
+        <div class="wild-emoji" id="wild-emoji">🎴</div>
+        <div class="wild-name" id="wild-name">Can't decide where to start?</div>
+        <div class="wild-step" id="wild-step">Let the Captain pick. One tap, one card, Step 1 only.</div>
+      </div>
+      <button class="wild-btn" id="wild-draw" type="button">🎲 Draw My Wild Card</button>
+      <div class="wild-actions" id="wild-actions" hidden>
+        <a class="wild-btn go" id="wild-go" href="#">Start Step 1 →</a>
+        <button class="wild-swap" id="wild-swap" type="button">🔄 Swap card (1 left)</button>
+      </div>
+      <div class="wild-note" id="wild-note"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">🧭 Voyage Progress</div>
+    <div class="voyage-card">
+      <div class="voyage-row">
+        <span>COMBINED FIXES LOGGED</span>
+        <span class="num" id="voyage-num">0 / 401</span>
+      </div>
+      <div class="voyage-track"><div class="voyage-fill" id="voyage-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="section" id="nudge-section" hidden>
+    <div class="section-label">🧭 Captain’s Nudge</div>
+    <div class="nudge-card" id="nudge"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">🚢 Shipyard — Your Flagship</div>
+    <div class="ship-card" id="shipyard"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">⚓ The Fleet</div>
+    <div class="fleet" id="fleet"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">🛠️ Training Decks</div>
+    <div class="missions" id="missions"></div>
+  </div>
+
+  <div class="section">
+    <div class="log-card">
+      <div class="log-title">📋 Ship's Log — Backup &amp; Restore</div>
+      <div class="log-desc">
+        Progress is saved on this device only. Export a backup before switching devices,
+        clearing browser data, or reinstalling — then import it back whenever you need to.
+        On iPad, Export opens the share sheet: choose “Save to Files”.
+      </div>
+      <div class="log-btn-row">
+        <button class="log-btn primary" id="btn-export">⬇ Export Progress</button>
+        <label class="log-btn" for="file-import">⬆ Import Progress</label>
+        <input type="file" id="file-import" accept="application/json,.json">
+      </div>
+      <button class="log-link" id="btn-download" type="button" hidden>Prefer a plain download? Tap here.</button>
+      <div class="log-meta" id="log-meta">No backup exported yet this session.</div>
+      <div class="log-status" id="log-status"></div>
+
+      <div class="preview-box" id="preview-box">
+        <div class="preview-title">This backup contains:</div>
+        <div id="preview-rows"></div>
+        <div class="preview-actions">
+          <button class="log-btn" id="btn-cancel-import">Cancel</button>
+          <button class="log-btn primary" id="btn-confirm-import">Restore This Backup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    Combined progress reading and backup cover S.S. Wordcraft (Writing Academy), Math Decoder,
+    Number Sense Sketchbook, and The Drafting Room, which work when all local files are hosted
+    together on the same site (e.g. Netlify Drop, GitHub Pages, or Vercel). Opened directly from
+    Files/AirDrop, each app still saves its own progress normally — this hub just may not be able
+    to read across apps until it's online. Backup keys used: <code>writing-academy-v1</code>,
+    <code>step1-bridge-progress-v1</code>, <code>number-sense-sketchbook-v1</code>, and
+    <code>jj-drafting-room-v1</code>. The ship's name (<code>jj-hub-ship-v1</code>) is saved in the backup too.
+    Writing Academy's Boss Battles and badges are saved in the backup but are not counted in the progress bar
+    (it counts the 168 Writing Ladder rungs). The “opened from here” visit counts are not part of the backup.
+    <br><br>
+    The Number Theory Sketchbook (<code>numbertheorysketchbook.vercel.app</code>) lives on another site, so this hub
+    can't read it directly. Instead, tap <b>Send to hub</b> on its ship (or paste its Restore Code into the Number Theory card)
+    and the hub keeps a snapshot (<code>jj-hub-nts-v1</code>, 75 stages) that fills the Voyage bar, lights the cargo ship in the Fleet,
+    and rides along in this page's backup. A new code only ever <i>adds</i> stages. The snapshot is as fresh as the last time it was sent.
+    The Combinatorics Sketchbook (<code>combinatoricssketchbook.vercel.app</code>) is hosted separately too and
+    isn't included in the Voyage Progress bar or in this page's backup. It keeps its own save data on its own site.
+    <br><br>
+    KVIS Proving Ground (ASEAN/SBS, KVIS &amp; GAT prep) is hosted separately at
+    <code>kvis-proving-ground.vercel.app</code> and is still growing — all 8 teaching missions, the Shipyard,
+    the Mock Exam Arena and the Self-Intro Bay essay practice are live, and more is landing in phases. Like the other separately-hosted decks, it keeps its
+    own save data on its own site.
+  </div>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var APPS = [
+    {
+      key: "writing-academy-v1",
+      href: "writing-academy.html",
+      emoji: "🖋️",
+      name: "S.S. Wordcraft — Writing Academy",
+      step1: "Open the Chief Engineer's Office and tap ONE answer. Level 1 is just a choice, and writing comes later, one rung at a time.",
+      desc: "7 worlds · 24 missions · climb the 7-rung Writing Ladder · Boss Battles at the end",
+      total: 168,
+      valid: function (d) { return !!d.worlds && typeof d.worlds === "object"; },
+      countDone: function (data) {
+        if (!data || !data.worlds || typeof data.worlds !== "object") return 0;
+        var n = 0;
+        Object.keys(data.worlds).forEach(function (worldId) {
+          var missions = data.worlds[worldId];
+          if (!missions || typeof missions !== "object") return;
+          Object.keys(missions).forEach(function (missionId) {
+            var m = missions[missionId];
+            if (m && typeof m.levelIndex === "number") n += m.levelIndex;
+          });
+        });
+        return n;
+      },
+      xp: function () { return 0; },
+      noXp: true,               // Writing Academy keeps no XP, only rungs climbed
+      unit: "rungs"
+    },
+    {
+      key: "step1-bridge-progress-v1",
+      href: "jj-math-decoder.html",
+      emoji: "⚙️",
+      name: "Math Decoder",
+      step1: "Fix just ONE thing on the ship. One rivet in place counts as progress.",
+      desc: "17 visual tools · 52 themed fixes across the ship",
+      total: 52,
+      valid: function (d) { return !!d.stamps && typeof d.stamps === "object"; },
+      countDone: function (data) {
+        return data && data.stamps && typeof data.stamps === "object" ? Object.keys(data.stamps).length : 0;
+      },
+      xp: function (data) { return data && typeof data.xp === "number" ? data.xp : 0; },
+      unit: "fixes"
+    },
+    {
+      key: "number-sense-sketchbook-v1",
+      href: "number-sense-sketchbook.html",
+      emoji: "✏️",
+      name: "Number Sense Sketchbook",
+      step1: "Open the first chapter and try ONE example. Run a test, see what happens.",
+      desc: "12 chapters · 60 topics · see numbers, pick a strategy, prove why it works",
+      total: 60,
+      valid: function (d) { return !!d.topicsDone && typeof d.topicsDone === "object"; },
+      countDone: function (data) {
+        return data && data.topicsDone && typeof data.topicsDone === "object" ? Object.keys(data.topicsDone).length : 0;
+      },
+      xp: function (data) { return data && typeof data.xp === "number" ? data.xp : 0; },
+      unit: "topics"
+    },
+    {
+      key: "jj-drafting-room-v1",
+      href: "drafting-room.html",
+      emoji: "📐",
+      name: "The Drafting Room",
+      step1: "Open one blueprint folder and sketch the first model. Rough lines are fine, engineers revise.",
+      desc: "7 blueprint folders · sketch, table, graph & explain scientific models",
+      total: 46,
+      valid: function (d) { return !!d.models && typeof d.models === "object"; },
+      countDone: function (data) {
+        if (!data || !data.models || typeof data.models !== "object") return 0;
+        var n = 0;
+        Object.keys(data.models).forEach(function (id) { if (data.models[id] && data.models[id].complete) n++; });
+        return n;
+      },
+      xp: function (data) { return data && typeof data.totalXp === "number" ? data.totalXp : 0; },
+      unit: "models"
+    }
+  ];
+
+  var EXTERNAL_APPS = [
+    {
+      href: "https://numbertheorysketchbook.vercel.app/",
+      emoji: "⚓",
+      name: "Number Theory Sketchbook",
+      ship: "cargo", sync: true,
+      step1: "Open the first compartment and do ONE problem. Check one part before checking the whole ship.",
+      desc: "15 compartments · Chief Engineer training manual — primes, factors, multiples & more"
+    },
+    {
+      href: "https://combinatoricssketchbook.vercel.app/",
+      emoji: "🧮",
+      name: "Combinatorics Sketchbook",
+      ship: "clipper", fleetNote: "Dry dock — her ship is still a blueprint. Design coming later.",
+      step1: "Open the first chapter and solve ONE counting puzzle. Count slowly, count your way.",
+      desc: "Counting, arrangements & choices — a training manual for combinatorics"
+    },
+    {
+      href: "https://kvis-proving-ground.vercel.app/",
+      emoji: "⚓",
+      name: "KVIS Proving Ground",
+      ship: "liner", fleetNote: "Her ship is built in the KVIS Shipyard. Tap to visit her.",
+      step1: "Open the Chart Table, pick ONE mission, do the first step only. Sea trials start with one test.",
+      desc: "Sea Trials Bridge — ASEAN/SBS, KVIS & GAT prep. 8 missions, a Shipyard to build your liner, Mock Exam Arena & Self-Intro essay practice (Titanic & Mario).",
+      btn: "Open Proving Ground ↗"
+    }
+  ];
+
+  var storageOk = true;
+  function safeGet(key) {
+    var raw = null;
+    try {
+      raw = localStorage.getItem(key);
+    } catch (e) {
+      storageOk = false;          // storage itself is blocked (e.g. file://)
+      return null;
+    }
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;                // unreadable save: treat as "not started", NOT as "storage blocked"
+    }
+  }
+
+  // Never let one app's odd save data break the whole hub.
+  function readStats(app, data) {
+    var done = 0, xp = 0;
+    try { done = Number(app.countDone(data)); } catch (e) { done = 0; }
+    try { xp = Number(app.xp(data)); } catch (e) { xp = 0; }
+    if (!isFinite(done) || done < 0) done = 0;
+    if (!isFinite(xp) || xp < 0) xp = 0;
+    return { done: Math.min(done, app.total), xp: xp };
+  }
+
+  function levelFromXp(xp) {
+    return Math.floor(xp / 100) + 1;
+  }
+
+  // ---- Shipyard: a flagship built from the four on-site decks (2 parts per deck) ----
+  var SHIP_KEY = "jj-hub-ship-v1";
+  var memShipName = "";
+
+  // ---- Number Theory Sketchbook: progress arrives as a Restore Code (hosted on another site, so no shared storage) ----
+  var NTS_KEY = "jj-hub-nts-v1";
+  var EXTRA_KEYS = [SHIP_KEY, NTS_KEY];   // hub-owned data that rides along in the backup file
+  var NTS_MODULES = 15, NTS_STAGES = 5, NTS_TOTAL = NTS_MODULES * NTS_STAGES;
+  var NTS_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+  var memNts = null;
+
+  function ntsCrc16(bytes) {
+    var crc = 0xFFFF;
+    for (var i = 0; i < bytes.length; i++) {
+      crc ^= (bytes[i] << 8);
+      for (var j = 0; j < 8; j++) crc = (crc & 0x8000) ? (((crc << 1) ^ 0x1021) & 0xFFFF) : ((crc << 1) & 0xFFFF);
+    }
+    return crc;
+  }
+  // text -> [15 x 5 booleans] or null. Same format the Number Theory Sketchbook's Ship's Log makes.
+  function ntsDecode(text) {
+    var t = String(text == null ? "" : text).toUpperCase().replace(/[\s\-_]/g, "");
+    if (t.indexOf("NTS") === 0) t = t.slice(3);
+    t = t.replace(/O/g, "0").replace(/[IL]/g, "1");
+    if (t.length !== 20) return null;
+    var all = [], i, j;
+    for (i = 0; i < t.length; i++) {
+      var n = NTS_ALPHABET.indexOf(t.charAt(i));
+      if (n < 0) return null;
+      for (j = 4; j >= 0; j--) all.push((n >> j) & 1);
+    }
+    var bytes = [];
+    for (i = 0; i < 96; i += 8) { var b = 0; for (j = 0; j < 8; j++) b = (b << 1) | all[i + j]; bytes.push(b); }
+    var data = bytes.slice(0, 10), crc = (bytes[10] << 8) | bytes[11];
+    if (ntsCrc16(data) !== crc) return null;
+    var bits = [];
+    data.forEach(function (byte) { for (var k = 7; k >= 0; k--) bits.push((byte >> k) & 1); });
+    var version = 0; for (i = 0; i < 5; i++) version = (version << 1) | bits[i];
+    if (version !== 1) return null;
+    var completed = [];
+    for (var m = 0; m < NTS_MODULES; m++) { var row = []; for (var s = 0; s < NTS_STAGES; s++) row.push(bits[5 + m * 5 + s] === 1); completed.push(row); }
+    return completed;
+  }
+  function ntsClean(obj) {
+    if (!obj || typeof obj !== "object" || !Array.isArray(obj.completed) || obj.completed.length !== NTS_MODULES) return null;
+    var completed = obj.completed.map(function (row) {
+      var r = []; for (var s = 0; s < NTS_STAGES; s++) r.push(!!(Array.isArray(row) && row[s])); return r;
+    });
+    var at = typeof obj.savedAt === "string" && isFinite(Date.parse(obj.savedAt)) ? obj.savedAt : null;
+    return { v: 1, completed: completed, savedAt: at };
+  }
+  function ntsLoad() {
+    var raw = null;
+    try { raw = localStorage.getItem(NTS_KEY); } catch (e) { return memNts; }
+    if (!raw) return memNts;
+    try { return ntsClean(JSON.parse(raw)); } catch (e) { return null; }
+  }
+  // Adding a code never takes progress away: a stage counts if EITHER the old snapshot or the new code has it.
+  function ntsStore(completed) {
+    var old = ntsLoad(), merged = completed.map(function (row, m) {
+      return row.map(function (v, s) { return !!(v || (old && old.completed[m][s])); });
+    });
+    var snap = { v: 1, completed: merged, savedAt: new Date().toISOString() };
+    memNts = snap;
+    try { localStorage.setItem(NTS_KEY, JSON.stringify(snap)); } catch (e) { storageOk = false; }
+    return snap;
+  }
+  function ntsCounts(completed) {
+    var out = { stages: 0, parts: 0 };
+    if (!completed) return out;
+    completed.forEach(function (row) {
+      var n = row.filter(Boolean).length; out.stages += n; if (n >= NTS_STAGES) out.parts++;
+    });
+    return out;
+  }
+  var NTS_PART_IDS = ["keel", "hull", "stackA", "bell", "tanks", "engine", "rudder", "stackB", "tower", "boats", "crane", "funnel", "ballast", "mast", "flag"];
+  var NTS_SHAPES = {
+  keel:'<path d="M112,172 L520,172 L506,184 Q484,191 462,191 L160,191 Q130,191 112,172 Z" fill="#8A5A18"/><rect x="150" y="186" width="320" height="4" rx="2" fill="#D9A441"/>',
+  hull:'<path d="M92,124 L548,124 Q532,158 504,172 L112,172 Q96,152 92,124 Z" fill="#34556F"/><rect x="94" y="132" width="452" height="4" fill="#C85A4A"/><path d="M200,136 L200,170 M300,136 L300,172 M400,136 L400,172 M480,136 L480,166" stroke="#1F3A50" stroke-width="3" fill="none"/>',
+  ballast:'<rect x="308" y="150" width="76" height="16" rx="3" fill="#4C9A8B"/><rect x="408" y="150" width="76" height="16" rx="3" fill="#4C9A8B"/><path d="M318,158 L374,158 M418,158 L474,158" stroke="#E3F2EE" stroke-width="2" fill="none"/>',
+  engine:'<rect x="116" y="140" width="76" height="26" rx="4" fill="#16293A" stroke="#D9A441" stroke-width="1.5"/><circle cx="136" cy="153" r="8" fill="#D9A441"/><circle cx="136" cy="153" r="3" fill="#16293A"/><rect x="154" y="144" width="8" height="18" fill="#D9A441"/><rect x="168" y="144" width="8" height="18" fill="#D9A441"/>',
+  rudder:'<path d="M100,150 L84,150 L78,190 L102,178 Z" fill="#5B6B78"/>',
+  tower:'<rect x="112" y="64" width="58" height="60" fill="#F1ECDD"/><rect x="108" y="58" width="66" height="6" fill="#C85A4A"/><rect x="118" y="106" width="46" height="8" rx="1" fill="#0E2A45"/><rect x="118" y="72" width="14" height="10" rx="1" fill="#0E2A45"/><rect x="150" y="72" width="14" height="10" rx="1" fill="#0E2A45"/><circle cx="141" cy="90" r="9" fill="#fff" stroke="#0E2A45" stroke-width="2"/><path d="M141,90 L141,84 M141,90 L146,92" stroke="#0E2A45" stroke-width="2" fill="none"/>',
+  funnel:'<path d="M180,124 L184,80 L202,80 L206,124 Z" fill="#C85A4A"/><rect x="183" y="75" width="21" height="6" fill="#16293A"/><rect x="182" y="98" width="23" height="6" fill="#D9A441"/>',
+  boats:'<path d="M214,112 L236,112 Q234,122 228,124 L220,124 Q214,120 214,112 Z" fill="#E0A458" stroke="#8A5A18" stroke-width="1.5"/><path d="M240,112 L262,112 Q260,122 254,124 L246,124 Q240,120 240,112 Z" fill="#E0A458" stroke="#8A5A18" stroke-width="1.5"/>',
+  stackA:'<rect x="272" y="100" width="28" height="24" fill="#C85A4A" stroke="#16293A" stroke-width="1.5"/><rect x="300" y="100" width="28" height="24" fill="#E0A458" stroke="#16293A" stroke-width="1.5"/><rect x="272" y="76" width="28" height="24" fill="#4C9A8B" stroke="#16293A" stroke-width="1.5"/><rect x="300" y="76" width="28" height="24" fill="#6FA6BE" stroke="#16293A" stroke-width="1.5"/>',
+  stackB:'<rect x="336" y="100" width="28" height="24" fill="#6FA6BE" stroke="#16293A" stroke-width="1.5"/><rect x="364" y="100" width="28" height="24" fill="#C85A4A" stroke="#16293A" stroke-width="1.5"/><rect x="336" y="76" width="28" height="24" fill="#E0A458" stroke="#16293A" stroke-width="1.5"/><rect x="364" y="76" width="28" height="24" fill="#4C9A8B" stroke="#16293A" stroke-width="1.5"/><rect x="336" y="52" width="28" height="24" fill="#C85A4A" stroke="#16293A" stroke-width="1.5"/><rect x="364" y="52" width="28" height="24" fill="#6FA6BE" stroke="#16293A" stroke-width="1.5"/>',
+  tanks:'<rect x="400" y="102" width="22" height="22" rx="8" fill="#F1ECDD" stroke="#0F3652" stroke-width="1.5"/><rect x="426" y="102" width="22" height="22" rx="8" fill="#F1ECDD" stroke="#0F3652" stroke-width="1.5"/><rect x="400" y="110" width="22" height="6" fill="#4C9A8B"/><rect x="426" y="110" width="22" height="6" fill="#E0A458"/>',
+  crane:'<rect x="462" y="60" width="12" height="64" fill="#D9A441"/><path d="M468,60 L520,50 L520,55 L468,67 Z" fill="#D9A441"/><rect x="454" y="54" width="10" height="10" fill="#8A5A18"/><path d="M516,53 L516,88" stroke="#16293A" stroke-width="2" fill="none"/><rect x="512" y="88" width="8" height="6" fill="#16293A"/>',
+  bell:'<rect x="524" y="104" width="3" height="20" fill="#8A5A18"/><path d="M517,108 Q517,97 526,97 Q535,97 535,108 Z" fill="#E0A458" stroke="#8A5A18" stroke-width="1.5"/><circle cx="526" cy="111" r="2.5" fill="#8A5A18"/>',
+  mast:'<rect x="139" y="20" width="4" height="44" fill="#F1ECDD"/><rect x="128" y="30" width="26" height="3" fill="#F1ECDD"/><circle cx="141" cy="22" r="4" fill="#E0A458"/>',
+  flag:'<rect x="139" y="6" width="4" height="16" fill="#F1ECDD"/><path d="M143,6 L178,12 L143,19 Z" fill="#C85A4A"/>'
+};
+  function ntsShipSvg(completed) {
+    var built = "", outline = "";
+    NTS_PART_IDS.forEach(function (id, i) {
+      var done = completed ? completed[i].filter(Boolean).length : 0;
+      var op = done > 0 ? Math.max(0.5, 0.3 + 0.7 * (done / 5)) : 0;
+      built += '<g style="opacity:' + op + '">' + NTS_SHAPES[id] + '</g>';
+      outline += '<g class="nts-o">' + NTS_SHAPES[id] + '</g>';
+    });
+    return '<svg class="fleet-ship wide" viewBox="0 0 620 225" role="img" aria-label="S.S. Number Cruncher, built from Number Theory progress">' +
+      '<rect width="620" height="172" fill="#0b2237" opacity="0.55"/>' + built +
+      '<path d="M0,172 Q40,164 80,172 T160,172 T240,172 T320,172 T400,172 T480,172 T560,172 T640,172 L640,225 L0,225 Z" fill="#2a6a9c" opacity="0.4"/>' + outline + '</svg>';
+  }
+  function ntsAgo(iso) {
+    var t = Date.parse(iso || ""); if (!isFinite(t)) return "";
+    var d = Math.max(0, Math.floor((Date.now() - t) / 86400000));
+    return d === 0 ? "sent today" : d === 1 ? "sent yesterday" : "sent " + d + " days ago";
+  }
+  function showSyncBanner(html, isErr) {
+    var el = document.getElementById("sync-banner");
+    if (!el) return;
+    el.innerHTML = html;
+    el.className = "sync-banner" + (isErr ? " err" : "");
+    el.hidden = false;
+  }
+  // Takes a code (from the link or the paste box) and updates the saved snapshot. Returns {ok, msg}.
+  function ntsReceive(text) {
+    var completed = ntsDecode(text);
+    if (!completed) return { ok: false, msg: "That code didn't work. Check it against the original, one letter may be off." };
+    var snap = ntsStore(completed), n = ntsCounts(snap.completed);
+    return { ok: true, msg: "🎉 Number Theory progress received! " + n.stages + " of " + NTS_TOTAL + " stages, " + n.parts + " of " + NTS_MODULES + " ship parts built." };
+  }
+  // Link from the Sketchbook: https://…/#nts=NTS-XXXXX-XXXXX-XXXXX-XXXXX
+  function ntsReceiveFromLink() {
+    var m = /^#nts=([^&]+)/.exec(window.location.hash || "");
+    if (!m) return;
+    var code = ""; try { code = decodeURIComponent(m[1]); } catch (e) { code = m[1]; }
+    try { history.replaceState(null, "", window.location.pathname + window.location.search); } catch (e) {}
+    var r = ntsReceive(code);
+    showSyncBanner(r.ok ? r.msg + "<small>See her on the Fleet. Tap here to close.</small>" : r.msg + "<small>Tap here to close.</small>", !r.ok);
+  }
+
+  function escHtml(t) {
+    return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function cleanShipName(t) {
+    return String(t == null ? "" : t).replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 24);
+  }
+  function getShipName() {
+    var raw = null;
+    try { raw = localStorage.getItem(SHIP_KEY); } catch (e) { return memShipName; }
+    if (!raw) return memShipName;
+    try {
+      var obj = JSON.parse(raw);
+      return obj && typeof obj.name === "string" ? cleanShipName(obj.name) : "";
+    } catch (e) { return ""; }
+  }
+  function setShipName(name) {
+    memShipName = name;
+    try { localStorage.setItem(SHIP_KEY, JSON.stringify({ name: name })); } catch (e) {}
+  }
+
+  // half 0 = first half of the deck (lights up by 50%), half 1 = second half (50% to 100%)
+  var SHIP_SHORT = {
+    "number-sense-sketchbook-v1": "Number Sense",
+    "step1-bridge-progress-v1": "Math Decoder",
+    "jj-drafting-room-v1": "Drafting Room",
+    "writing-academy-v1": "Writing"
+  };
+  var SHIP_PARTS = [
+    { id: "keel",   name: "Keel",         deck: "number-sense-sketchbook-v1", half: 0 },
+    { id: "hull",   name: "Hull Plates",  deck: "number-sense-sketchbook-v1", half: 1 },
+    { id: "engine", name: "Engine Room",  deck: "step1-bridge-progress-v1",   half: 0 },
+    { id: "prop",   name: "Propeller",    deck: "step1-bridge-progress-v1",   half: 1 },
+    { id: "decks",  name: "Passenger Decks", deck: "jj-drafting-room-v1",     half: 0 },
+    { id: "funnels", name: "Funnels",     deck: "jj-drafting-room-v1",        half: 1 },
+    { id: "bridge", name: "Bridge",       deck: "writing-academy-v1",         half: 0 },
+    { id: "mast",   name: "Signal Mast",  deck: "writing-academy-v1",         half: 1 }
+  ];
+
+  function repeatShapes(n, fn) { var out = ""; for (var i = 0; i < n; i++) out += fn(i); return out; }
+
+  var SHIP_SHAPES = {
+    keel:
+      '<path class="k1" d="M112,172 L520,172 L506,184 Q484,191 462,191 L160,191 Q130,191 112,172 Z"/>' +
+      '<rect class="k2" x="150" y="186" width="320" height="4" rx="2"/>',
+    hull:
+      '<path class="h1" d="M92,124 L548,124 Q532,158 504,172 L112,172 Q96,152 92,124 Z"/>' +
+      '<rect class="h2" x="94" y="132" width="452" height="4"/>' +
+      repeatShapes(15, function (i) { return '<circle class="h3" cx="' + (122 + i * 28) + '" cy="160" r="2.4"/>'; }),
+    engine:
+      '<rect class="e0" x="168" y="138" width="130" height="28" rx="4"/>' +
+      '<circle class="e1" cx="196" cy="152" r="10"/><circle class="e0" cx="196" cy="152" r="4"/>' +
+      '<rect class="e1" x="224" y="142" width="10" height="20"/><rect class="e1" x="244" y="142" width="10" height="20"/><rect class="e1" x="264" y="142" width="10" height="20"/>',
+    prop:
+      '<rect class="p1" x="90" y="169" width="16" height="6"/>' +
+      '<path class="p1" d="M84,150 Q96,161 84,172 Q76,161 84,150 Z"/>' +
+      '<path class="p1" d="M84,172 Q96,183 84,194 Q76,183 84,172 Z"/>' +
+      '<circle class="p2" cx="84" cy="172" r="4"/>' +
+      '<path class="p2" d="M100,172 L110,172 L110,194 L102,194 Z"/>',
+    decks:
+      '<rect class="d1" x="140" y="104" width="340" height="20" rx="2"/>' +
+      '<rect class="d1" x="180" y="84" width="250" height="20" rx="2"/>' +
+      '<rect class="d1" x="230" y="66" width="150" height="18" rx="2"/>' +
+      repeatShapes(17, function (i) { return '<rect class="d2" x="' + (152 + i * 19) + '" y="111" width="8" height="6" rx="1"/>'; }) +
+      repeatShapes(13, function (i) { return '<rect class="d2" x="' + (192 + i * 19) + '" y="91" width="8" height="6" rx="1"/>'; }) +
+      repeatShapes(7,  function (i) { return '<rect class="d2" x="' + (242 + i * 19) + '" y="72" width="8" height="6" rx="1"/>'; }),
+    funnels:
+      '<path class="f1" d="M250,66 L254,28 L282,28 L286,66 Z"/><rect class="f2" x="252" y="23" width="32" height="6" rx="1"/><rect class="f3" x="251" y="40" width="34" height="5"/>' +
+      '<path class="f1" d="M302,66 L306,28 L334,28 L338,66 Z"/><rect class="f2" x="304" y="23" width="32" height="6" rx="1"/><rect class="f3" x="303" y="40" width="34" height="5"/>',
+    bridge:
+      '<rect class="b1" x="388" y="48" width="44" height="36"/><rect class="b2" x="384" y="43" width="52" height="5"/>' +
+      '<rect class="b3" x="394" y="56" width="32" height="8" rx="1"/><rect class="b3" x="394" y="70" width="32" height="6" rx="1"/>',
+    mast:
+      '<rect class="m1" x="408" y="4" width="3" height="39"/><rect class="m1" x="398" y="13" width="23" height="2"/>' +
+      '<path class="m2" d="M411,5 L442,10 L411,16 Z"/><circle class="m3" cx="409.5" cy="24" r="4"/>'
+  };
+
+  // ---- Visits: counts taps on launch links made from this hub (the decks themselves are not tracked) ----
+  var VISIT_KEY = "jj-hub-visits-v1";
+  var memVisits = {};
+  var UNIT_ONE = { rungs: "rung", fixes: "fix", topics: "topic", models: "model" };
+  function unitWord(unit, n) { return n === 1 && UNIT_ONE[unit] ? UNIT_ONE[unit] : unit; }
+
+  function deckList() {
+    var list = [];
+    APPS.forEach(function (a) { list.push({ key: a.key, name: a.name, emoji: a.emoji, href: a.href, step1: a.step1, external: false }); });
+    EXTERNAL_APPS.forEach(function (a) {
+      if (!a.comingSoon) list.push({ key: a.href, name: a.name, emoji: a.emoji, href: a.href, step1: a.step1, external: true });
+    });
+    return list;
+  }
+  function getVisits() {
+    var raw = null;
+    try { raw = localStorage.getItem(VISIT_KEY); } catch (e) { return memVisits; }
+    if (!raw) return memVisits;
+    try {
+      var o = JSON.parse(raw);
+      return o && typeof o === "object" && !Array.isArray(o) ? o : {};
+    } catch (e) { return {}; }
+  }
+  function visitInfo(key) {
+    var e = getVisits()[key];
+    var count = e && typeof e.count === "number" && isFinite(e.count) && e.count > 0 ? Math.floor(e.count) : 0;
+    var last = e && typeof e.last === "string" ? Date.parse(e.last) : NaN;
+    return { count: count, last: isFinite(last) ? last : null };
+  }
+  function recordVisit(key) {
+    var known = deckList().some(function (d) { return d.key === key; });
+    if (!known) return;
+    var v = getVisits();
+    var info = visitInfo(key);
+    v[key] = { count: info.count + 1, last: new Date().toISOString() };
+    memVisits = v;
+    try { localStorage.setItem(VISIT_KEY, JSON.stringify(v)); } catch (e) {}
+  }
+  function daysSince(ts) { return Math.max(0, Math.floor((Date.now() - ts) / 86400000)); }
+  function agoText(days) { return days === 0 ? "today" : days === 1 ? "yesterday" : days + " days ago"; }
+  function visitsText(key) {
+    var v = visitInfo(key);
+    if (!v.count) return "Not opened from here yet";
+    return "👣 Opened from here " + v.count + (v.count === 1 ? " time" : " times") + (v.last !== null ? " · last " + agoText(daysSince(v.last)) : "");
+  }
+  function visitsHtml(key) { return '<div class="mission-visits">' + visitsText(key) + '</div>'; }
+
+  // ---- Captain's nudge: friendly pointer at the quietest deck. No streaks, nothing to lose. ----
+  var nudgeDismissed = false;
+  function renderNudge() {
+    var section = document.getElementById("nudge-section");
+    var el = document.getElementById("nudge");
+    if (!section || !el) return;
+    var decks = deckList();
+    var infos = decks.map(function (d) { return { deck: d, v: visitInfo(d.key) }; });
+    var anyVisit = infos.some(function (i) { return i.v.count > 0; });
+    if (nudgeDismissed || !anyVisit) { section.hidden = true; return; }
+    var quiet = infos[0];
+    infos.forEach(function (i) {
+      var t = i.v.last === null ? 0 : i.v.last;
+      var qt = quiet.v.last === null ? 0 : quiet.v.last;
+      if (t < qt) quiet = i;
+    });
+    var d = quiet.deck, msg;
+    if (quiet.v.last === null) {
+      msg = d.emoji + " <strong>" + escHtml(d.name) + "</strong> is waiting for its first visit.";
+    } else {
+      var days = daysSince(quiet.v.last);
+      if (days < 3) { section.hidden = true; return; }
+      msg = d.emoji + " <strong>" + escHtml(d.name) + "</strong> has been quiet for " + days + " days.";
+    }
+    el.innerHTML = msg + '<br>Step 1: ' + escHtml(d.step1) +
+      '<div class="nudge-actions"><a class="nudge-go" data-deck="' + d.key + '" href="' + d.href + '"' +
+      (d.external ? ' target="_blank" rel="noopener"' : '') + '>Open ' + escHtml(d.name) + ' →</a>' +
+      '<button class="nudge-skip" id="nudge-skip" type="button">Not now</button></div>';
+    section.hidden = false;
+    el.querySelector("#nudge-skip").addEventListener("click", function () { nudgeDismissed = true; section.hidden = true; });
+  }
+
+  // ---- Flagship drawing, with an optional "if you finish this deck" preview ----
+  function shipSvg(progressById, previewIds) {
+    var built = "", outline = "", preview = "";
+    SHIP_PARTS.forEach(function (p) {
+      var f = progressById[p.id] || 0;
+      // any progress at all shows clearly: Step 1 earns a visible piece straight away
+      var op = f <= 0 ? 0 : Math.max(0.45, 0.25 + 0.75 * f).toFixed(2);
+      built += '<g class="hs-built" data-part="' + p.id + '" style="opacity:' + op + '">' + SHIP_SHAPES[p.id] + '</g>';
+      outline += '<g class="hs-outline">' + SHIP_SHAPES[p.id] + '</g>';
+    });
+    (previewIds || []).forEach(function (id) {
+      preview += '<g class="hs-built hs-preview" data-preview="' + id + '">' + SHIP_SHAPES[id] + '</g>';
+    });
+    var sea = '<path d="M0,172 Q40,164 80,172 T160,172 T240,172 T320,172 T400,172 T480,172 T560,172 T640,172 L640,225 L0,225 Z" fill="#2a6a9c" opacity="0.4"/>';
+    return '<svg class="ship-svg" viewBox="0 0 620 225" role="img" aria-label="Your flagship under construction">' +
+      '<rect width="620" height="172" fill="#0b2237" opacity="0.5"/>' + built + preview + sea + outline + '</svg>';
+  }
+
+  var selectedDeck = null;       // which deck's pieces are being previewed
+  function renderShipyard(deckFrac, deckDone) {
+    var el = document.getElementById("shipyard");
+    if (!el) return;
+    deckDone = deckDone || {};
+    var items = SHIP_PARTS.map(function (p) {
+      var f = Number(deckFrac[p.deck]);
+      if (!isFinite(f) || f < 0) f = 0;
+      if (f > 1) f = 1;
+      var pr = p.half === 0 ? Math.min(1, f / 0.5) : Math.max(0, Math.min(1, (f - 0.5) / 0.5));
+      var app = APPS.filter(function (a) { return a.key === p.deck; })[0];
+      return { part: p, progress: pr, app: app };
+    });
+    var progressById = {}, certified = 0, sum = 0;
+    items.forEach(function (it) {
+      progressById[it.part.id] = it.progress;
+      sum += it.progress;
+      if (it.progress >= 1) certified++;
+    });
+    var pct = Math.round((sum / SHIP_PARTS.length) * 100);
+    var next = items.filter(function (it) { return it.progress > 0 && it.progress < 1; })[0] ||
+               items.filter(function (it) { return it.progress === 0; })[0];
+
+    // one entry per deck (two parts each), in ship order
+    var decks = [];
+    items.forEach(function (it) {
+      var d = decks.filter(function (x) { return x.key === it.part.deck; })[0];
+      if (!d) {
+        var total = it.app.total, done = Math.min(total, Math.max(0, Number(deckDone[it.part.deck]) || 0));
+        d = { key: it.part.deck, app: it.app, total: total, done: done, unit: it.app.unit, parts: [] };
+        decks.push(d);
+      }
+      d.parts.push(it);
+    });
+
+    function goalHtml() {
+      var d = decks.filter(function (x) { return x.key === selectedDeck; })[0];
+      if (!d) return 'Tap a deck below to preview the pieces it builds.';
+      var a = d.parts[0], b = d.parts[1];
+      var after = Math.round(((sum + (2 - a.progress - b.progress)) / SHIP_PARTS.length) * 100);
+      if (d.done >= d.total) return '✅ <strong>' + escHtml(d.app.name) + '</strong> is complete — the ' + a.part.name + ' and the ' + b.part.name + ' are built!';
+      var half = Math.ceil(d.total / 2), line = '<strong>' + escHtml(d.app.name) + '</strong> builds the ' + a.part.name + ' and the ' + b.part.name +
+        '. You\u2019re at ' + d.done + ' of ' + d.total + ' ' + d.unit + '. ';
+      if (d.done < half) {
+        var n = half - d.done;
+        line += n + ' more ' + unitWord(d.unit, n) + ' lights the ' + a.part.name + '. ';
+      } else {
+        var m = d.total - d.done;
+        line += 'The ' + a.part.name + ' is built! ' + m + ' more ' + unitWord(d.unit, m) + ' lights the ' + b.part.name + '. ';
+      }
+      return line + 'Finish it all and the ship goes from ' + pct + '% to ' + after + '%.';
+    }
+
+    var html =
+      '<div class="ship-eyebrow">Flagship of the Fleet</div>' +
+      '<h2 class="ship-name" id="ship-name"></h2>' +
+      '<div class="ship-nameform"><input id="ship-name-input" type="text" maxlength="24" autocomplete="off" placeholder="Name your ship…" aria-label="Ship name">' +
+      '<button id="ship-name-btn" type="button">Name her</button></div>' +
+      '<div id="ship-art"></div>' +
+      '<div class="ship-meter" aria-label="Build progress"><div class="ship-meter-fill" style="width:' + pct + '%"></div></div>' +
+      '<p class="ship-meter-text">' + certified + ' of ' + SHIP_PARTS.length + ' parts certified — ship ' + pct + '% built. Every step you do adds a piece.</p>' +
+      '<div class="ship-pick-label">PREVIEW A DECK</div><div class="ship-decks" id="ship-decks">';
+    decks.forEach(function (d) {
+      html += '<button class="ship-deck-btn" type="button" data-deck-pick="' + d.key + '" aria-pressed="false">' +
+        d.app.emoji + ' ' + escHtml(SHIP_SHORT[d.key]) + '<small>' + d.done + '/' + d.total + ' ' + d.unit + '</small></button>';
+    });
+    html += '</div><p class="ship-goal" id="ship-goal"></p>';
+
+    if (next) {
+      var started = next.progress > 0;
+      html += '<a class="ship-next" id="ship-next" data-deck="' + next.app.key + '" href="' + next.app.href + '">' +
+        (started ? 'Keep building: ' : 'Start here: ') + next.part.name + ' → ' + escHtml(next.app.name) + '</a>';
+    } else {
+      html += '<div class="ship-launch" id="ship-launch">🎉 ALL SYSTEMS GO! <span id="ship-launch-name"></span> is ready to launch.</div>';
+    }
+
+    html += '<details class="ship-parts"><summary>See all ' + SHIP_PARTS.length + ' parts</summary><div class="ship-chips">';
+    items.forEach(function (it) {
+      var done = it.progress >= 1;
+      var vc = visitInfo(it.app.key).count;
+      html += '<a class="ship-chip' + (done ? ' done' : '') + '" data-deck="' + it.app.key + '" href="' + it.app.href + '">' +
+        (done ? '✅ ' : '🔧 ') + it.part.name + ' — ' + Math.round(it.progress * 100) + '%' +
+        '<small>built by ' + escHtml(it.app.name) + ' · ' + vc + (vc === 1 ? ' visit' : ' visits') + ' from here</small></a>';
+    });
+    html += '</div></details>';
+    el.innerHTML = html;
+
+    function paint() {
+      var d = decks.filter(function (x) { return x.key === selectedDeck; })[0];
+      el.querySelector("#ship-art").innerHTML = shipSvg(progressById, d ? d.parts.map(function (p) { return p.part.id; }) : []);
+      el.querySelector("#ship-goal").innerHTML = goalHtml();
+      [].forEach.call(el.querySelectorAll("[data-deck-pick]"), function (btn) {
+        btn.setAttribute("aria-pressed", btn.getAttribute("data-deck-pick") === selectedDeck ? "true" : "false");
+      });
+    }
+    [].forEach.call(el.querySelectorAll("[data-deck-pick]"), function (btn) {
+      btn.addEventListener("click", function () {
+        var k = btn.getAttribute("data-deck-pick");
+        selectedDeck = selectedDeck === k ? null : k;
+        paint();
+      });
+    });
+    paint();
+
+    function title() { var n = getShipName(); return "RMS " + (n ? n : "Flagship"); }
+    el.querySelector("#ship-name").textContent = title();
+    var ln = el.querySelector("#ship-launch-name");
+    if (ln) ln.textContent = title();
+    var input = el.querySelector("#ship-name-input");
+    input.value = getShipName();
+    function save() {
+      setShipName(cleanShipName(input.value));
+      input.value = getShipName();
+      el.querySelector("#ship-name").textContent = title();
+      if (ln) ln.textContent = title();
+    }
+    el.querySelector("#ship-name-btn").addEventListener("click", save);
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") save(); });
+  }
+
+  // ---- The Fleet: ships for the decks hosted elsewhere (KVIS has its own ship; the others are in dry dock) ----
+  var FLEET_ART = {
+    liner:
+      '<path d="M14,52 L186,52 Q176,64 160,66 L30,66 Q18,62 14,52 Z"/><rect x="40" y="40" width="120" height="12"/><rect x="62" y="30" width="76" height="10"/>' +
+      '<rect x="70" y="12" width="12" height="18"/><rect x="90" y="12" width="12" height="18"/><rect x="110" y="12" width="12" height="18"/><rect x="130" y="12" width="12" height="18"/>',
+    cargo:
+      '<path d="M12,50 L188,50 Q180,64 166,66 L28,66 Q16,62 12,50 Z"/><rect x="30" y="32" width="34" height="18"/><rect x="40" y="20" width="10" height="12"/>' +
+      '<rect x="78" y="40" width="22" height="10"/><rect x="104" y="40" width="22" height="10"/><path d="M146,50 L146,18 L176,36"/>',
+    clipper:
+      '<path d="M20,56 L180,56 Q170,68 150,70 L40,70 Q26,66 20,56 Z"/><path d="M65,56 L65,10 M100,56 L100,6 M135,56 L135,10"/>' +
+      '<path d="M65,14 L65,52 L90,52 Z M100,10 L100,52 L128,52 Z M135,14 L135,52 L158,52 Z"/>'
+  };
+  function renderFleet() {
+    var el = document.getElementById("fleet");
+    if (!el) return;
+    var snap = ntsLoad(), n = ntsCounts(snap ? snap.completed : null);
+    el.innerHTML = EXTERNAL_APPS.filter(function (a) { return !a.comingSoon; }).map(function (app) {
+      var art, note;
+      if (app.sync) {
+        art = ntsShipSvg(snap ? snap.completed : null);
+        note = snap
+          ? "S.S. Number Cruncher: " + n.parts + " of " + NTS_MODULES + " parts built (" + n.stages + "/" + NTS_TOTAL + " stages). Tap to visit her."
+          : "S.S. Number Cruncher is waiting in dry dock. Send her progress from the Sketchbook and she lights up.";
+      } else {
+        art = '<svg class="fleet-ship" viewBox="0 0 200 90" role="img" aria-label="Ship silhouette" fill="none" stroke="#B3822C" stroke-width="1.6" stroke-dasharray="5 4">' +
+          (FLEET_ART[app.ship] || FLEET_ART.liner) + '<path d="M0,68 Q25,62 50,68 T100,68 T150,68 T200,68" stroke-dasharray="0" stroke="#0E2A45" opacity="0.35"/></svg>';
+        note = app.fleetNote || "";
+      }
+      return '<a class="fleet-card" data-deck="' + app.href + '" href="' + app.href + '" target="_blank" rel="noopener">' + art +
+        '<div><div class="fleet-name">' + app.emoji + ' ' + escHtml(app.name) + '</div>' +
+        '<div class="fleet-sub">' + escHtml(note) + '</div>' + visitsHtml(app.href) + '</div></a>';
+    }).join("");
+  }
+
+  function renderMissions() {
+    var container = document.getElementById("missions");
+    container.innerHTML = "";
+    var totalDone = 0, totalAll = 0;
+    var ntsSnap = ntsLoad(), ntsN = ntsCounts(ntsSnap ? ntsSnap.completed : null);
+    totalDone += ntsN.stages; totalAll += NTS_TOTAL;
+    var deckFrac = {}, deckDone = {};
+
+    APPS.forEach(function (app) {
+      var data = safeGet(app.key);
+      var stats = readStats(app, data);
+      var done = stats.done;
+      var xp = stats.xp;
+      totalDone += done;
+      totalAll += app.total;
+      deckFrac[app.key] = app.total ? done / app.total : 0;
+      deckDone[app.key] = done;
+
+      var card = document.createElement("div");
+      card.className = "mission-card";
+
+      var statsHtml;
+      if (data) {
+        statsHtml =
+          '<div class="mission-stats">' +
+          (app.noXp ? '' : '<span class="stat"><strong>Lv ' + levelFromXp(xp) + '</strong></span>' +
+          '<span class="stat">' + xp + ' XP</span>') +
+          '<span class="stat"><strong>' + done + '</strong>/' + app.total + ' ' + app.unit + '</span>' +
+          '</div>';
+      } else {
+        statsHtml = '<div class="mission-stats is-empty">Not started yet' +
+          (storageOk ? '' : ' &mdash; progress unavailable in this context') + '</div>';
+      }
+
+      card.innerHTML =
+        '<div class="mission-top">' +
+          '<div class="mission-emoji">' + app.emoji + '</div>' +
+          '<div class="mission-info">' +
+            '<div class="mission-name">' + app.name + '</div>' +
+            '<div class="mission-desc">' + app.desc + '</div>' +
+          '</div>' +
+        '</div>' +
+        statsHtml +
+        visitsHtml(app.key) +
+        '<a class="mission-btn" data-deck="' + app.key + '" href="' + app.href + '">Launch Mission →</a>';
+
+      container.appendChild(card);
+    });
+
+    EXTERNAL_APPS.forEach(function (app) {
+      var card = document.createElement("div");
+      card.className = "mission-card";
+      if (app.comingSoon) card.style.opacity = "0.75";
+
+      var badgeText = app.comingSoon ? "Coming soon &middot; not deployed yet" : "Hosted separately &middot; new tab";
+      var btnHtml = app.comingSoon
+        ? '<span class="mission-btn" style="opacity:0.55; cursor:default;">Coming Soon</span>'
+        : '<a class="mission-btn" data-deck="' + app.href + '" href="' + app.href + '" target="_blank" rel="noopener">' + (app.btn || "Open Sketchbook ↗") + '</a>';
+
+      card.innerHTML =
+        '<div class="mission-top">' +
+          '<div class="mission-emoji">' + app.emoji + '</div>' +
+          '<div class="mission-info">' +
+            '<div class="mission-name">' + app.name + '</div>' +
+            '<div class="mission-desc">' + app.desc + '</div>' +
+          '</div>' +
+        '</div>' +
+        (app.sync
+          ? (ntsSnap
+              ? '<div class="mission-stats"><span class="stat"><strong>' + ntsN.stages + '</strong>/' + NTS_TOTAL + ' stages</span>' +
+                '<span class="stat"><strong>' + ntsN.parts + '</strong>/' + NTS_MODULES + ' ship parts</span>' +
+                (ntsSnap.savedAt ? '<span class="stat">' + ntsAgo(ntsSnap.savedAt) + '</span>' : '') + '</div>'
+              : '<div class="mission-stats is-empty">Not sent to the hub yet. Inside the Sketchbook, tap <strong>Send to hub</strong> on the ship.</div>')
+          : '<div class="mission-stats is-empty"><span class="mission-external-badge">' + badgeText + '</span></div>') +
+        visitsHtml(app.href) +
+        btnHtml +
+        (app.sync ? '<div class="nts-paste"><div class="nts-paste-label">OR PASTE A RESTORE CODE FROM THE SKETCHBOOK</div>' +
+          '<input type="text" class="nts-input" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="NTS-XXXXX-XXXXX-XXXXX-XXXXX" aria-label="Number Theory restore code">' +
+          '<button type="button" class="nts-go">Update ship</button><div class="nts-msg" role="status"></div></div>' : '');
+      container.appendChild(card);
+      if (app.sync) {
+        var goBtn = card.querySelector(".nts-go"), inp = card.querySelector(".nts-input"), msg = card.querySelector(".nts-msg");
+        goBtn.addEventListener("click", function () {
+          var r = ntsReceive(inp.value);
+          if (!r.ok) { msg.className = "nts-msg err"; msg.textContent = r.msg; return; }
+          showSyncBanner(r.msg + "<small>Tap here to close.</small>", false);
+          renderMissions();
+        });
+      }
+    });
+
+    document.getElementById("voyage-num").textContent = totalDone + " / " + totalAll;
+    var pct = totalAll ? Math.round((totalDone / totalAll) * 100) : 0;
+    document.getElementById("voyage-fill").style.width = pct + "%";
+    renderNudge();
+    renderShipyard(deckFrac, deckDone);
+    renderFleet();
+  }
+
+  function showStatus(msg, kind) {
+    var el = document.getElementById("log-status");
+    el.textContent = msg;
+    el.className = "log-status show " + kind;
+  }
+  function hideStatus() {
+    var el = document.getElementById("log-status");
+    el.className = "log-status";
+  }
+
+  // ---- Export ----
+  // Builds the backup text, or returns null (and says why) when there is nothing to save.
+  function buildBackup() {
+    var bundle = {
+      app: "jj-engineering-academy-backup",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      data: {}
+    };
+    var foundAny = false;
+    APPS.forEach(function (app) {
+      var raw = null;
+      try { raw = localStorage.getItem(app.key); } catch (e) { storageOk = false; }
+      bundle.data[app.key] = raw || null;
+      if (raw) foundAny = true;
+    });
+
+    EXTRA_KEYS.forEach(function (key) {
+      var raw = null;
+      try { raw = localStorage.getItem(key); } catch (e) { storageOk = false; }
+      bundle.data[key] = raw || null;
+      if (key === NTS_KEY && raw) foundAny = true;
+    });
+
+    if (!foundAny) {
+      showStatus("Nothing to export yet — no progress found on this device. Open a training deck first.", "warn");
+      return null;
+    }
+
+    var d = new Date();
+    var stamp = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    return { text: JSON.stringify(bundle, null, 2), fileName: "jj-academy-progress-" + stamp + ".json", when: d };
+  }
+
+  function markExported(when) {
+    document.getElementById("log-meta").textContent = "Last exported: " + when.toLocaleString();
+  }
+
+  // Classic download (desktop, and the fallback when the share sheet isn't available).
+  function downloadBackup(b) {
+    var blob = new Blob([b.text], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = b.fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    markExported(b.when);
+    showStatus("Backup downloaded. Keep it somewhere safe (Files, email, cloud drive).", "ok");
+  }
+
+  // Share sheet is used only on touch devices (iPad / phone), where plain downloads can be flaky.
+  function makeBackupFile(b) {
+    try { return new File([b.text], b.fileName, { type: "application/json" }); } catch (e) { return null; }
+  }
+  function canShareFile(file) {
+    try {
+      return !!(file && navigator.share && navigator.canShare && navigator.maxTouchPoints > 0 &&
+                navigator.canShare({ files: [file] }));
+    } catch (e) { return false; }
+  }
+
+  document.getElementById("btn-export").addEventListener("click", function () {
+    hideStatus();
+    var b = buildBackup();
+    if (!b) return;
+    var file = makeBackupFile(b);
+    if (!canShareFile(file)) { downloadBackup(b); return; }
+
+    // navigator.share must be called straight from the tap, so nothing async happens before it.
+    navigator.share({ files: [file], title: "J.J.\u2019s Academy backup" }).then(function () {
+      markExported(b.when);
+      showStatus("Backup shared. Make sure you chose a safe place (Save to Files, email, or a cloud drive).", "ok");
+    }).catch(function (err) {
+      if (err && err.name === "AbortError") {
+        showStatus("Share cancelled \u2014 no backup was saved. Tap Export Progress again whenever you\u2019re ready.", "warn");
+      } else {
+        downloadBackup(b);          // share failed for another reason: fall back to a normal download
+      }
+    });
+  });
+
+  // Small "download instead" link, shown only where the share sheet is in use.
+  (function () {
+    var link = document.getElementById("btn-download");
+    var probe = null;
+    try { probe = new File(["{}"], "probe.json", { type: "application/json" }); } catch (e) {}
+    if (!canShareFile(probe)) return;
+    link.hidden = false;
+    link.addEventListener("click", function () {
+      hideStatus();
+      var b = buildBackup();
+      if (b) downloadBackup(b);
+    });
+  })();
+
+  // ---- Import ----
+  var pendingBundle = null;
+
+  document.getElementById("file-import").addEventListener("change", function (e) {
+    hideStatus();
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var parsed;
+      try {
+        parsed = JSON.parse(reader.result);
+      } catch (err) {
+        showStatus("That file isn't valid JSON — couldn't read it.", "err");
+        e.target.value = "";
+        return;
+      }
+      if (!parsed || typeof parsed !== "object" || !parsed.data || typeof parsed.data !== "object") {
+        showStatus("That doesn't look like an Academy backup file.", "err");
+        e.target.value = "";
+        return;
+      }
+
+      var rows = [];
+      var warnRows = [];
+      var skipped = 0;
+      var clean = { data: {}, exportedAt: parsed.exportedAt };
+      APPS.forEach(function (app) {
+        var raw = parsed.data[app.key];
+        if (!raw) return;
+        if (typeof raw !== "string") { try { raw = JSON.stringify(raw); } catch (err) { raw = ""; } }
+        var parsedInner = null;
+        try { parsedInner = JSON.parse(raw); } catch (err) { parsedInner = null; }
+        if (!parsedInner || typeof parsedInner !== "object" || (app.valid && !app.valid(parsedInner))) { skipped++; return; }
+        clean.data[app.key] = raw;
+        var st = readStats(app, parsedInner);
+        rows.push(
+          '<div class="preview-row">' + app.emoji + ' <strong>' + app.name + '</strong> — ' +
+          (app.noXp ? '' : 'Level ' + levelFromXp(st.xp) + ', ' + st.xp + ' XP, ') + st.done + '/' + app.total + ' ' + app.unit +
+          '</div>'
+        );
+        var now = readStats(app, safeGet(app.key));
+        var moreHere = app.noXp ? now.done > st.done : now.xp > st.xp;
+        if (moreHere) {
+          warnRows.push(
+            '<div class="preview-row" style="color:var(--nudge-ink);">⚠ This device already has more progress in <strong>' +
+            app.name + '</strong> (' + (app.noXp ? now.done + ' ' + app.unit + ' vs ' + st.done + ' ' + app.unit : now.xp + ' XP vs ' + st.xp + ' XP') +
+            ' in the backup). Restoring will replace it.</div>'
+          );
+        }
+      });
+
+      if (!rows.length) {
+        showStatus("This backup file doesn't contain readable progress for any of the training decks.", "err");
+        e.target.value = "";
+        return;
+      }
+      EXTRA_KEYS.forEach(function (key) {
+        var raw = parsed.data[key];
+        if (!raw) return;
+        var obj = null;
+        try { obj = typeof raw === "string" ? JSON.parse(raw) : raw; } catch (err) { obj = null; }
+        if (key === NTS_KEY) {
+          var ntsC = ntsClean(obj);
+          if (!ntsC) return;
+          clean.data[key] = JSON.stringify(ntsC);
+          var ntsK = ntsCounts(ntsC.completed);
+          rows.push('<div class="preview-row">⚓ Number Theory ship: ' + ntsK.stages + '/' + NTS_TOTAL + ' stages, ' + ntsK.parts + '/' + NTS_MODULES + ' parts</div>');
+          return;
+        }
+        if (!obj || typeof obj !== "object" || typeof obj.name !== "string") return;
+        var nm = cleanShipName(obj.name);
+        clean.data[key] = JSON.stringify({ name: nm });
+        if (nm) rows.push('<div class="preview-row">🚢 Ship name: <strong>RMS ' + escHtml(nm) + '</strong></div>');
+      });
+      rows = rows.concat(warnRows);
+      if (skipped) {
+        rows.push('<div class="preview-row">Skipped ' + skipped + ' unreadable entr' + (skipped === 1 ? 'y' : 'ies') + '.</div>');
+      }
+      parsed = clean;
+
+      var whenText = parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleString() : "unknown date";
+      rows.unshift('<div class="preview-row">Exported: ' + whenText + '</div>');
+
+      document.getElementById("preview-rows").innerHTML = rows.join("");
+      document.getElementById("preview-box").classList.add("show");
+      pendingBundle = parsed;
+      e.target.value = "";
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById("btn-cancel-import").addEventListener("click", function () {
+    pendingBundle = null;
+    document.getElementById("preview-box").classList.remove("show");
+  });
+
+  document.getElementById("btn-confirm-import").addEventListener("click", function () {
+    if (!pendingBundle) return;
+    var restored = 0, failed = 0;
+    APPS.forEach(function (app) {
+      var raw = pendingBundle.data[app.key];
+      if (!raw) return;
+      try {
+        localStorage.setItem(app.key, raw);
+        restored++;
+      } catch (err) {
+        failed++;
+        storageOk = false;
+      }
+    });
+    EXTRA_KEYS.forEach(function (key) {
+      var raw = pendingBundle.data[key];
+      if (!raw) return;
+      try { localStorage.setItem(key, raw); } catch (err) { failed++; storageOk = false; }
+    });
+    document.getElementById("preview-box").classList.remove("show");
+    pendingBundle = null;
+
+    if (restored && !failed) {
+      showStatus("Progress restored! Open a training deck to see it in action.", "ok");
+    } else if (failed) {
+      showStatus("Couldn't write to storage in this context. Try opening this hub from a hosted URL (Vercel/Netlify/GitHub Pages) instead of a local file.", "err");
+    } else {
+      showStatus("Nothing was restored.", "warn");
+    }
+    renderMissions();
+  });
+
+  // ---- Captain's Wild Card ----
+  (function () {
+    var LAST_KEY = "jj-wild-card-last-v1";
+    var face = document.getElementById("wild-face");
+    var emojiEl = document.getElementById("wild-emoji");
+    var nameEl = document.getElementById("wild-name");
+    var stepEl = document.getElementById("wild-step");
+    var drawBtn = document.getElementById("wild-draw");
+    var actions = document.getElementById("wild-actions");
+    var goBtn = document.getElementById("wild-go");
+    var swapBtn = document.getElementById("wild-swap");
+    var noteEl = document.getElementById("wild-note");
+
+    var CHEERS = [
+      "Systems check: green. Just do Step 1.",
+      "Engine start = ONE turn of the key.",
+      "Prototype first, polish later.",
+      "Rough draft = working blueprint.",
+      "5 minutes of testing beats 0 minutes of planning."
+    ];
+
+    var swapsLeft = 1;
+    var current = null;
+    var busy = false;
+
+    function allDecks() {
+      var list = [];
+      APPS.forEach(function (a) {
+        list.push({ key: a.key, name: a.name, emoji: a.emoji, href: a.href, step1: a.step1, external: false });
+      });
+      EXTERNAL_APPS.forEach(function (a) {
+        if (a.comingSoon) return;
+        list.push({ key: a.href, name: a.name, emoji: a.emoji, href: a.href, step1: a.step1, external: true });
+      });
+      return list;
+    }
+    function getLast() { try { return localStorage.getItem(LAST_KEY); } catch (e) { return null; } }
+    function setLast(v) { try { localStorage.setItem(LAST_KEY, v); } catch (e) {} }
+
+    function pickDeck(excludeName) {
+      var decks = allDecks();
+      var pool = decks.filter(function (d) { return d.name !== excludeName; });
+      if (!pool.length) pool = decks;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function land(deck) {
+      current = deck;
+      face.classList.remove("shuffling");
+      face.setAttribute("aria-busy", "false");
+      emojiEl.textContent = deck.emoji;
+      nameEl.textContent = deck.name;
+      stepEl.textContent = "Step 1: " + deck.step1;
+      goBtn.setAttribute("href", deck.href);
+      goBtn.setAttribute("data-deck", deck.key);
+      if (deck.external) {
+        goBtn.setAttribute("target", "_blank");
+        goBtn.setAttribute("rel", "noopener");
+      } else {
+        goBtn.removeAttribute("target");
+        goBtn.removeAttribute("rel");
+      }
+      swapBtn.hidden = swapsLeft <= 0;
+      actions.hidden = false;
+      noteEl.textContent = swapsLeft > 0
+        ? "Not feeling it? You get 1 swap."
+        : "Card locked in. " + CHEERS[Math.floor(Math.random() * CHEERS.length)];
+      face.classList.remove("landed");
+      void face.offsetWidth;
+      face.classList.add("landed");
+      setLast(deck.name);
+      busy = false;
+    }
+
+    function draw(excludeName) {
+      if (busy) return;
+      busy = true;
+      drawBtn.hidden = true;
+      actions.hidden = true;
+      noteEl.textContent = "";
+      var target = pickDeck(excludeName);
+      var decks = allDecks();
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var ticks = reduce ? 0 : 12;
+      var i = 0;
+      face.classList.add("shuffling");
+      face.setAttribute("aria-busy", "true");
+      (function tick() {
+        if (i >= ticks) { land(target); return; }
+        var d = decks[Math.floor(Math.random() * decks.length)];
+        emojiEl.textContent = d.emoji;
+        nameEl.textContent = d.name;
+        stepEl.textContent = "Shuffling the deck…";
+        i++;
+        setTimeout(tick, 50 + i * 10);
+      })();
+    }
+
+    drawBtn.addEventListener("click", function () { draw(getLast()); });
+    swapBtn.addEventListener("click", function () {
+      if (busy || swapsLeft <= 0 || !current) return;
+      swapsLeft--;
+      draw(current.name);
+    });
+  })();
+
+  // Count launches made from the hub. Links that open a new tab refresh the hub a moment later;
+  // same-tab links leave the page, so nothing is redrawn under the tap.
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    var a = t && t.closest ? t.closest("a[data-deck]") : null;
+    if (!a) return;
+    recordVisit(a.getAttribute("data-deck"));
+    if (a.getAttribute("target") === "_blank") setTimeout(renderMissions, 400);
+  }, true);
+
+  ntsReceiveFromLink();
+  document.getElementById("sync-banner").addEventListener("click", function () { this.hidden = true; });
+  renderMissions();
+  if (!storageOk) {
+    showStatus("Storage isn't accessible in this context, so live progress and backups may not work. Host these files together online (Netlify Drop or GitHub Pages) for full functionality.", "warn");
+  }
+})();
+</script>
+
+
+</body></html>

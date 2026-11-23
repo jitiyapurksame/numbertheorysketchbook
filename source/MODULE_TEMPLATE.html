@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="{{SHORT_TITLE}}">
+<title>Module {{N}}: {{TITLE}} — {{THEME_TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-paper: #E9EDF0;
+    --bg-paper-alt: #DCE3E8;
+    --bg-blueprint: #0F3652;
+    --bg-blueprint-dark: #0A2740;
+    --line-blueprint: #BFE3F0;
+    --line-blueprint-dim: #6FA6BE;
+    --accent-brass: #B8834D;
+    --accent-brass-dark: #8F6636;
+    --accent-brass-light: #E8C89A;
+    --success: #4C9A8B;
+    --success-dark: #367568;
+    --alert: #E0A458;
+    --alert-dark: #B87B32;
+    --text-ink: #1D2B33;
+    --text-ink-soft: #4A5A63;
+    --text-on-blueprint: #EAF6FB;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;}
+  body{
+    margin:0;
+    background:var(--bg-paper);
+    background-image:
+      linear-gradient(var(--bg-paper-alt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-paper-alt) 1px, transparent 1px);
+    background-size: 28px 28px;
+    font-family:'Quicksand', sans-serif;
+    color:var(--text-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
+  }
+  h1,h2,h3,.mono{ font-family:'Space Mono', monospace; }
+
+  .topbar{
+    background:var(--bg-blueprint);
+    color:var(--text-on-blueprint);
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:4px solid var(--accent-brass);
+  }
+  .topbar .eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--line-blueprint-dim); text-transform:uppercase; }
+  .topbar h1{ margin:2px 0 2px; font-size:20px; letter-spacing:0.5px; }
+  .topbar .sub{ font-size:13px; color:var(--line-blueprint); opacity:0.85; }
+
+  .motto{
+    background:var(--accent-brass); color:#2A1B0C; text-align:center;
+    font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:0.5px;
+    padding:7px 10px;
+  }
+
+  .stagebar{ display:flex; justify-content:space-between; gap:6px; padding:12px 14px 4px; max-width:720px; margin:0 auto; }
+  .stagebtn{ flex:1; text-align:center; background:none; border:none; cursor:pointer; padding:6px 2px; font-family:'Space Mono',monospace; font-size:10px; color:var(--text-ink-soft); }
+  .stagebtn .dot{ width:30px;height:30px; border-radius:50%; background:#fff; border:2.5px solid var(--bg-paper-alt); display:flex;align-items:center;justify-content:center; margin:0 auto 4px; font-size:15px; transition: all .2s; }
+  .stagebtn.active .dot{ border-color:var(--accent-brass); background:var(--accent-brass-light); transform:scale(1.12); }
+  .stagebtn.done .dot{ border-color:var(--success); background:var(--success); color:#fff; }
+  .stagebtn.active{ color:var(--text-ink); font-weight:700; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 14px calc(90px + env(safe-area-inset-bottom)); }
+  .panel{ background:#fff; border-radius:var(--radius); padding:18px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(15,54,82,0.08); border:1px solid #DCE3E8; }
+  .panel h2{ font-size:17px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .panel .tag{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--accent-brass-dark); text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+  .panel p{ line-height:1.55; font-size:14.5px; color:var(--text-ink); }
+
+  .blueprint-box{
+    background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:16px; margin:12px 0;
+    background-image: linear-gradient(var(--bg-blueprint-dark) 1px, transparent 1px), linear-gradient(90deg, var(--bg-blueprint-dark) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  .btn{
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+    background:var(--accent-brass); color:#2A1B0C; transition: transform .08s ease; touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn:hover{ background:var(--accent-brass-dark); color:#fff; }
+  .btn.ghost{ background:transparent; border:2px solid var(--accent-brass); color:var(--accent-brass-dark); }
+  .btn.big{ width:100%; padding:14px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+
+  .factorlist{ font-family:'Space Mono',monospace; font-size:13px; text-align:center; padding:10px; color:var(--text-on-blueprint); }
+  .factorlist b{ color:var(--accent-brass-light); }
+
+  .lightgrid{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:12px 0; }
+  .lightbulb{
+    width:32px;height:32px; border-radius:50%; border:2.5px solid #fff;
+    transition: all .3s;
+  }
+  .lightbulb.red{ background:var(--alert); box-shadow:0 0 8px rgba(224,164,88,0.6); }
+  .lightbulb.blue{ background:var(--line-blueprint-dim); box-shadow:0 0 8px rgba(111,166,190,0.6); }
+
+  .runningtotal{ text-align:center; font-family:'Space Mono',monospace; font-size:15px; font-weight:700; color:var(--text-on-blueprint); margin:8px 0 4px; }
+  .runningtotal .lbl{ display:block; font-size:11px; color:var(--accent-brass-light); font-weight:400; }
+
+  .rainbowlist{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+  .pairrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px;
+    font-family:'Space Mono',monospace; font-size:13px; color:var(--text-on-blueprint);
+    border-left:3px solid var(--accent-brass);
+  }
+
+  .verdictbox{ text-align:center; font-family:'Space Mono',monospace; font-size:14px; font-weight:700; padding:12px; border-radius:10px; margin-top:8px; }
+  .verdictbox.match{ background:rgba(76,154,139,0.2); color:var(--success); }
+  .verdictbox.mismatch{ background:rgba(224,164,88,0.22); color:var(--alert); }
+
+  .rulecard{ background:var(--bg-blueprint); color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center; border:2px dashed var(--accent-brass); }
+  .rulecard .big{ font-family:'Space Mono',monospace; font-size:14px; font-weight:700; line-height:1.7; }
+  .rulecard .big .n{ color:var(--accent-brass-light); }
+  .toolcard{ background:var(--bg-paper); border-radius:10px; padding:10px 12px; margin:6px 0; border-left:4px solid var(--accent-brass); }
+  .toolcard .tname{ font-family:'Space Mono',monospace; font-weight:700; font-size:13px; color:var(--accent-brass-dark); }
+  .toolcard .tdesc{ font-size:13px; color:var(--text-ink-soft); margin-top:2px; }
+  .toolcard.practiced{ border-left-color:var(--success); }
+  .toolcard.practiced .tname{ color:var(--success-dark); }
+
+  .faq{ background:var(--bg-paper); border-left:4px solid var(--accent-brass); border-radius:0 10px 10px 0; padding:10px 12px; margin:10px 0; }
+  .faq .q{ font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .faq .a{ font-size:13.5px; color:var(--text-ink-soft); line-height:1.5; }
+
+  .caselog{ background:#fff; border:2px solid var(--bg-paper-alt); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .caselog .num{ display:inline-block; background:var(--accent-brass); color:#2A1B0C; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; padding:2px 8px; border-radius:6px; margin-bottom:6px; }
+  .caselog p{ font-size:14px; line-height:1.5; }
+  .revealstep{ background:var(--bg-paper); border-radius:8px; padding:8px 10px; margin:6px 0; font-size:13px; border-left:3px solid var(--success); }
+  .bonusbox{ border:2px dashed var(--accent-brass); border-radius:12px; padding:14px; background:rgba(184,131,77,0.06); }
+  .bonusbox .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--accent-brass-dark); font-weight:700; }
+
+  .finalebanner{
+    background:linear-gradient(135deg, var(--bg-blueprint), var(--bg-blueprint-dark));
+    color:var(--text-on-blueprint); border-radius:var(--radius); padding:20px 16px; text-align:center;
+    border:2px solid var(--accent-brass); margin-top:14px;
+  }
+  .finalebanner .big{ font-family:'Space Mono',monospace; font-size:16px; font-weight:700; color:var(--accent-brass-light); }
+
+  .navwrap{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid var(--bg-paper-alt); padding-bottom:env(safe-area-inset-bottom); }
+  .navinner{ max-width:720px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; }
+
+  .showme{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:2px solid var(--text-ink-soft);
+    border-radius:20px; padding:6px 12px; font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); cursor:pointer;
+    touch-action:manipulation; -webkit-user-select:none; min-height:44px;
+  }
+  .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
+
+  .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="eyebrow">RMS Design Files &middot; {{DIVISION}} Division</div>
+  <h1>{{ICON}} Module {{N}}: {{TITLE}}</h1>
+  <div class="sub">{{THEME_TITLE}} — {{ONE_LINE_HOOK}}</div>
+</div>
+<div class="motto">🔧 STEP 1 BEATS PERFECTION — {{STEP1_ACTION}}</div>
+
+<div class="stagebar" id="stagebar"></div>
+<main id="main"></main>
+
+<div class="navwrap">
+  <div class="navinner">
+    <button class="btn ghost" id="prevBtn" onclick="prevStage()">← Back</button>
+    <button class="btn big" id="nextBtn" onclick="nextStage()">Continue →</button>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   MODULE TEMPLATE — J.J.'s Number Theory Sketchbook
+   Replace every {{PLACEHOLDER}}. Keep the section order. Then run:
+       node source/verify.js
+   and ADD a math check there for every number you hardcode below.
+   ===================================================================== */
+
+/* ================= MATH HELPERS (live algorithms — never trust hardcoded answers) ================= */
+// function ... {}
+
+/* ================= STATE ================= */
+const STAGE_LABELS = ['📖 Model','🔍 Pattern','⚙️ Rule','💡 Why','🚀 Boss'];
+
+let memoryFallback = null;
+let storageBlocked = false;
+function loadState(){
+  try{ const raw = localStorage.getItem('{{STORAGE_KEY}}'); return raw ? JSON.parse(raw) : null; }
+  catch(e){ storageBlocked = true; return memoryFallback; }
+}
+function saveState(obj){
+  try{ localStorage.setItem('{{STORAGE_KEY}}', JSON.stringify(obj)); }
+  catch(e){ storageBlocked = true; memoryFallback = obj; }
+}
+
+// NOTE: if you add a field to this default object later, old saved progress will not have it.
+// Merge defensively:  state = Object.assign({}, defaults, loadState() || {})
+let state = loadState() || {
+  stage: 0,
+  completed: [false,false,false,false,false],
+  // stage-specific fields, e.g. s1_n: 5, s1_rowsAdded: 0, s2_reveal: 0,
+  boss_reveal: {1:0, 2:0, 3:0},
+  bonus_reveal: 0
+};
+function save(){ saveState(state); }
+
+/* ================= NAV ================= */
+function renderStageBar(){
+  const bar = document.getElementById('stagebar');
+  bar.innerHTML = STAGE_LABELS.map((label,i)=>{
+    let cls = 'stagebtn';
+    if(i===state.stage) cls+=' active';
+    if(state.completed[i]) cls+=' done';
+    return `<button class="${cls}" onclick="goStage(${i})">
+      <div class="dot">${state.completed[i] ? '✓' : (i+1)}</div>${label}
+    </button>`;
+  }).join('');
+}
+function goStage(i){ state.stage = i; save(); render(); window.scrollTo(0,0); }
+function nextStage(){
+  state.completed[state.stage] = true;
+  if(state.stage < 4){ state.stage++; save(); render(); window.scrollTo(0,0); }
+  else { save(); render(); }
+}
+function prevStage(){ if(state.stage>0){ state.stage--; save(); render(); window.scrollTo(0,0);} }
+
+/* ================= STAGE 1: VISUAL MODEL =================
+   HOUSE RULE: open with tappable/interactive CONCRETE objects the child builds one click at a time
+   (rows, chips, dials, grids). Never a bare text box + answer field. One click = one step. */
+function renderStage1(){
+  return `
+  <div class="panel">
+    <div class="tag">📖 Visual Model — {{STAGE1_TAG}}</div>
+    <h2>{{STAGE1_HEADING}}</h2>
+    <p>{{STAGE1_INSTRUCTION}} That's Step 1.</p>
+    <div class="blueprint-box">
+      <!-- concrete visual here -->
+      <div class="btnrow" style="justify-content:center"><button class="btn big" onclick="/* addOneStep */">{{STAGE1_BUTTON}}</button></div>
+    </div>
+  </div>`;
+}
+
+/* ================= STAGE 2: MENTAL STRATEGY ================= */
+function renderStage2(){
+  return `
+  <div class="panel">
+    <div class="tag">🔍 Mental Strategy — {{STAGE2_TAG}}</div>
+    <h2>{{STAGE2_HEADING}}</h2>
+    <p>{{STAGE2_INSTRUCTION}}</p>
+  </div>`;
+}
+
+/* ================= STAGE 3: GENERAL RULE ================= */
+function renderStage3(){
+  return `
+  <div class="panel">
+    <div class="tag">⚙️ General Rule — The Engineer's Method</div>
+    <h2>Write it in the logbook</h2>
+    <div class="rulecard"><div class="big">{{RULE_IN_4_LINES}}</div></div>
+    <table class="divtable"><tr><td>{{EX1}}</td><td>{{EX1_RESULT}}</td></tr></table>
+    <div class="step1banner">🧠 Memory hook: {{MEMORY_HOOK}}</div>
+  </div>`;
+}
+
+/* ================= STAGE 4: WHY IT WORKS (easy proof) ================= */
+function renderStage4(){
+  return `
+  <div class="panel">
+    <div class="tag">💡 Why It Works — The Proof</div>
+    <h2>{{WHY_QUESTION}}</h2>
+    <p>{{PROOF_IN_PLAIN_WORDS}}</p>
+    <div class="faq"><div class="q">{{FAQ_Q}}</div><div class="a">{{FAQ_A}}</div></div>
+  </div>`;
+}
+
+/* ================= STAGE 5: COMPETITION CHALLENGE =================
+   Three cases: Titanic (dominant) + Chemistry lab + Mario. ONE optional bonus only.
+   HOUSE RULE: every boss step that describes a process gets a REAL picture (reuse the module's own
+   Stage 1/2 visual) — not a text row. Pure one-line arithmetic may stay as a 'list' row.
+   Final hint level always states the answer outright. */
+function renderVisual(v){
+  if(v.type==='list'){
+    return `<div class="blueprint-box"><div class="rainbowlist">${v.rows.map(r=>`<div class="pairrow">${r}</div>`).join('')}</div></div>`;
+  }
+  // add module-specific visual types here (reuse the Stage 1/2 renderers)
+  return '';
+}
+
+const BOSS_DATA = {
+  1: { tag:'CASE 1 · RMS TITANIC', title:'{{TITANIC_TITLE}}', text:'{{TITANIC_PROBLEM}}',
+       steps:[ { text:'Step 1: …', visual:{type:'list', rows:['…']} },
+               { text:'Answer: …' } ] },
+  2: { tag:"CASE 2 · SHIP'S LAB", title:'{{LAB_TITLE}}', text:'{{LAB_PROBLEM}}',
+       steps:[ { text:'Step 1: …' }, { text:'Answer: …' } ] },
+  3: { tag:'CASE 3 · WARP PIPE WORKSHOP', title:"{{MARIO_TITLE}}", text:'{{MARIO_PROBLEM}}',
+       steps:[ { text:'Step 1: …' }, { text:'Answer: …' } ] }
+};
+function renderBossCard(id){
+  const data = BOSS_DATA[id];
+  const revealed = state.boss_reveal[id];
+  return `
+  <div class="caselog">
+    <div class="num">${data.tag}</div>
+    <p><b>${data.title}</b><br>${data.text}</p>
+    ${Array.from({length:revealed}).map((_,i)=>`
+      <div class="revealstep">${data.steps[i].text}</div>
+      ${data.steps[i].visual ? renderVisual(data.steps[i].visual) : ''}
+    `).join('')}
+    ${revealed < data.steps.length
+      ? `<button class="showme" onclick="revealBoss(${id})">🔓 Show me the next step</button>`
+      : `<div class="step1banner">✅ Case closed, Chief Engineer.</div>`}
+  </div>`;
+}
+function revealBoss(id){ state.boss_reveal[id]++; save(); render(); }
+
+const BONUS_STEPS = [
+  "Step 1: …",
+  "Answer: …"
+];
+function renderStage5(){
+  return `
+  <div class="panel">
+    <div class="tag">🚀 Boss Level — Captain's Puzzle Log</div>
+    <h2>Three cases on the Chief Engineer's desk</h2>
+    <p>Try each one yourself first. Stuck? Tap "Show me the next step" — never the full answer at once. Step 1 is always enough to start.</p>
+    ${renderBossCard(1)}
+    ${renderBossCard(2)}
+    ${renderBossCard(3)}
+    <div class="bonusbox">
+      <div class="badge">⭐ OPTIONAL BONUS — ONLY IF YOU WANT MORE</div>
+      <p style="margin:6px 0 0"><b>{{BONUS_TITLE}}:</b> {{BONUS_QUESTION}}</p>
+      ${Array.from({length:state.bonus_reveal}).map((_,i)=>`<div class="revealstep">${BONUS_STEPS[i]}</div>`).join('')}
+      ${state.bonus_reveal < BONUS_STEPS.length
+        ? `<button class="showme" onclick="revealBonus()">🔓 Show me the next step</button>`
+        : `<div class="step1banner">🏅 Boss Level complete — you've earned Chief Engineer status on {{TITLE}}.</div>`}
+    </div>
+  </div>`;
+}
+function revealBonus(){ state.bonus_reveal++; save(); render(); }
+
+/* ================= RENDER ================= */
+function render(){
+  renderStageBar();
+  const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
+  let html = renderers[state.stage]();
+  if(storageBlocked){
+    html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
+  }
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
+}
+render();
+</script>
+</body>
+</html>

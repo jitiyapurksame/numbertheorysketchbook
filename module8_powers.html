@@ -152,6 +152,41 @@
   .showme:hover{ border-color:var(--accent-brass); color:var(--accent-brass-dark); }
 
   .step1banner{ background:var(--accent-brass-light); border-radius:10px; padding:9px 12px; font-size:12.5px; color:#5C3E1B; margin:10px 0; font-weight:600; }
+
+  /* ---- Story Hook + Name Tags ---- */
+  .shk{ border:2px dashed var(--accent-brass); }
+  .shk .shk-step{ background:var(--bg-paper); border-radius:12px; padding:12px; margin:10px 0; }
+  .shk .shk-step p{ margin:0 0 8px; font-size:14.5px; }
+  .shk .shk-note{ background:var(--accent-brass-light); color:#5C3E1B; font-weight:700; }
+  .shk .hcap{ font-family:'Space Mono',monospace; font-size:11.5px; color:var(--text-ink-soft); text-align:center; margin-top:4px; }
+  .shk-dots{ display:flex; gap:6px; justify-content:center; margin:6px 0; }
+  .shk-dots span{ width:10px; height:10px; border-radius:50%; background:var(--bg-paper-alt); }
+  .shk-dots span.on{ background:var(--success); }
+  .shk-row{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:6px; }
+  .shk-g{ text-align:center; }
+  .shk-strip{ display:flex; flex-wrap:wrap; gap:3px; justify-content:center; margin-top:6px; }
+  .shk-cell{ width:26px; height:26px; border-radius:6px; background:#fff; border:1.5px solid var(--bg-paper-alt); display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:10.5px; color:var(--text-ink-soft); }
+  .shk-cell.ma{ background:var(--success); color:#fff; border-color:var(--success-dark); }
+  .shk-cell.mb{ background:#6FA6BE; color:#fff; border-color:#4A7F96; }
+  .shk-cell.both{ background:var(--alert); color:#402A08; border-color:var(--alert-dark); font-weight:700; }
+  .shk-drow{ display:flex; gap:8px; align-items:center; margin:3px 0; font-size:16px; }
+  .shk-drow b{ font-family:'Space Mono',monospace; font-size:11px; width:24px; color:var(--text-ink-soft); }
+  .shk-chips{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; justify-content:center; margin-top:6px; }
+  .shk-chips span{ background:#fff; border:2px solid var(--bg-blueprint); border-radius:16px; padding:4px 10px; font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--bg-blueprint); }
+  .shk-chips span.hi{ background:var(--success); color:#fff; border-color:var(--success-dark); }
+  .shk-chips i{ font-style:normal; color:var(--accent-brass-dark); }
+  .shk-log{ font-family:'Space Mono',monospace; font-size:12.5px; padding:6px 10px; border-radius:8px; margin:4px 0; }
+  .shk-log.ok{ background:#E3F2EE; color:#27594F; } .shk-log.bad{ background:#FBEBD2; color:#7A5014; }
+  .shk-lights{ display:flex; gap:8px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+  .shk-lights b{ width:26px; height:26px; border-radius:50%; border:2px solid var(--bg-blueprint); }
+  .shk-lights b.r{ background:#C85A4A; } .shk-lights b.b{ background:#5B8FB0; }
+  .shk-skip{ background:none; border:none; color:var(--text-ink-soft); text-decoration:underline; font-family:inherit; font-size:12.5px; min-height:44px; cursor:pointer; touch-action:manipulation; }
+  .ntag{ background:var(--accent-brass-light); color:#3B2810; border-radius:12px; padding:12px 14px; margin:8px 0; border:2px solid var(--accent-brass); }
+  .ntag .nt-h{ font-family:'Space Mono',monospace; font-weight:700; font-size:13px; letter-spacing:.5px; margin-bottom:6px; }
+  .ntag p{ margin:0 0 6px; font-size:14px; line-height:1.5; color:#3B2810; }
+  .ntag .nt-ex{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+  .ntag .nt-ex span{ background:#fff; border-radius:16px; padding:4px 10px; font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; color:#0F3652; }
+  .ntag .nt-eng{ font-weight:700; margin-bottom:0; }
 </style>
 </head>
 <body>
@@ -188,7 +223,22 @@ function saveState(obj){
   catch(e){ storageBlocked = true; memoryFallback = obj; }
 }
 
-let state = loadState() || {
+
+// Safe merge: saved progress always wins, but any field added in a later update
+// gets its default instead of "undefined". (Never remove: protects J.J.'s saved progress.)
+function mergeState(defaults, saved){
+  const base = JSON.parse(JSON.stringify(defaults));
+  if(!saved || typeof saved !== 'object' || Array.isArray(saved)) return base;
+  const out = Object.assign({}, base, saved);
+  if(base.boss_reveal && saved.boss_reveal && typeof saved.boss_reveal === 'object'){
+    out.boss_reveal = Object.assign({}, base.boss_reveal, saved.boss_reveal);
+  }
+  const c = Array.isArray(saved.completed) ? saved.completed : [];
+  out.completed = [0,1,2,3,4].map(i => !!c[i]);
+  return out;
+}
+
+const DEFAULT_STATE = {
   stage: 0,
   completed: [false,false,false,false,false],
   s1_n: 5,
@@ -197,6 +247,7 @@ let state = loadState() || {
   boss_reveal: {1:0, 2:0, 3:0},
   bonus_reveal: 0
 };
+let state = mergeState(DEFAULT_STATE, loadState());
 function save(){ saveState(state); }
 
 /* ================= NAV ================= */
@@ -421,7 +472,7 @@ function revealBonus(){ state.bonus_reveal++; save(); render(); }
 function render(){
   renderStageBar();
   const renderers = [renderStage1, renderStage2, renderStage3, renderStage4, renderStage5];
-  let html = renderers[state.stage]();
+  let html = (state.stage === 2 ? renderShk() : '') + renderers[state.stage]();
   if(storageBlocked){
     html = `<div class="step1banner" style="background:var(--alert);color:#402A08">⚠️ Progress-saving is off in this browser mode (common when opening the file directly, or in Private Browsing). The mission still works fully — just keep this tab open to keep your place.</div>` + html;
   }
@@ -429,6 +480,67 @@ function render(){
   document.getElementById('prevBtn').style.visibility = state.stage===0 ? 'hidden' : 'visible';
   document.getElementById('nextBtn').textContent = state.stage===4 ? '🏁 Finish Module' : 'Continue →';
 }
+/* ================= STORY HOOK + NAME TAGS (shown at the top of Stage 3) ================= */
+let shkStep = 0;
+function shkDots(r, c, o){
+  o = o || {}; const s = o.sq ? 18 : 11, g = o.sq ? 3 : 5, w = c*(s+g)-g, h = r*(s+g)-g; let x = '';
+  for(let i=0;i<r;i++) for(let j=0;j<c;j++){
+    x += o.sq ? `<rect x="${j*(s+g)}" y="${i*(s+g)}" width="${s}" height="${s}" rx="3" fill="#BFE3F0" stroke="#0F3652" stroke-width="2"/>`
+              : `<circle cx="${j*(s+g)+s/2}" cy="${i*(s+g)+s/2}" r="${s/2}" fill="${o.fill||'#4C9A8B'}"/>`;
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:${w}px;max-width:100%;height:auto" role="img" aria-label="${r} by ${c} grid">${x}</svg>`;
+}
+function shkVis(v){
+  if(!v) return '';
+  if(v.t === 'grids') return `<div class="shk-row">${v.list.map(g => `<div class="shk-g">${shkDots(g.r,g.c,g)}<div class="hcap">${g.cap||''}</div></div>`).join('')}</div>`;
+  if(v.t === 'strip'){
+    let x = ''; for(let k=1;k<=v.n;k++){ const a = k%v.a===0, b = k%v.b===0; x += `<span class="shk-cell ${a&&b?'both':a?'ma':b?'mb':''}">${k}</span>`; }
+    return `<div class="shk-strip">${x}</div><div class="hcap">${v.cap||''}</div>`;
+  }
+  if(v.t === 'dial'){
+    const n = v.n, R = 62; let x = `<circle cx="80" cy="80" r="${R+14}" fill="#fff" stroke="#0F3652" stroke-width="3"/>`;
+    for(let k=0;k<n;k++){ const a = (k/n)*2*Math.PI - Math.PI/2, px = 80+R*Math.cos(a), py = 80+R*Math.sin(a);
+      x += `<circle cx="${px}" cy="${py}" r="11" fill="${k===v.pos?'#E0A458':'#E9EDF0'}" stroke="#0F3652" stroke-width="1.5"/><text x="${px}" y="${py+4}" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" font-weight="700" fill="#0F3652">${k}</text>`; }
+    const a = (v.pos/n)*2*Math.PI - Math.PI/2; x += `<line x1="80" y1="80" x2="${80+(R-16)*Math.cos(a)}" y2="${80+(R-16)*Math.sin(a)}" stroke="#B87B32" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="80" r="5" fill="#0F3652"/>`;
+    return `<svg viewBox="0 0 160 160" style="width:180px;max-width:100%;display:block;margin:6px auto 0" role="img" aria-label="clock with ${n} positions">${x}</svg><div class="hcap">${v.cap||''}</div>`;
+  }
+  if(v.t === 'pairs'){
+    const groups = Math.ceil(v.n/2); let x = '';
+    for(let k=0;k<v.n;k++){ const gI = Math.floor(k/2), lone = (v.n%2===1 && k===v.n-1);
+      x += `<circle cx="${gI*54+14+(k%2)*24}" cy="20" r="11" fill="${lone?'#E0A458':'#4C9A8B'}" stroke="#0F3652" stroke-width="2"/>`; }
+    return `<svg viewBox="0 0 ${groups*54} 40" style="width:${groups*54}px;max-width:100%;height:auto;display:block;margin:6px auto 0" role="img" aria-label="${v.n} coins in pairs">${x}</svg><div class="hcap">${v.cap||''}</div>`;
+  }
+  if(v.t === 'stairs'){
+    let x = ''; for(let r=1;r<=v.n;r++) for(let c=0;c<r;c++) x += `<rect x="${c*22}" y="${(r-1)*22}" width="19" height="19" rx="3" fill="#E8C89A" stroke="#8F6636" stroke-width="2"/>`;
+    return `<svg viewBox="0 0 ${v.n*22} ${v.n*22}" style="width:${v.n*22}px;max-width:100%;height:auto;display:block;margin:6px auto 0" role="img" aria-label="staircase of blocks">${x}</svg><div class="hcap">${v.cap||''}</div>`;
+  }
+  if(v.t === 'double'){
+    let x = ''; for(let k=0;k<=v.n;k++){ const c = Math.pow(2,k); x += `<div class="shk-drow"><b>${k}h</b><span>${'🛸'.repeat(c)}</span></div>`; }
+    return x + `<div class="hcap">${v.cap||''}</div>`;
+  }
+  if(v.t === 'chips') return `<div class="shk-chips">${v.list.map((c,i)=>(i?'<i>→</i>':'')+`<span class="${v.hi===i?'hi':''}">${c}</span>`).join('')}</div><div class="hcap">${v.cap||''}</div>`;
+  if(v.t === 'log') return v.rows.map(r => `<div class="shk-log ${r[1]?'ok':'bad'}">${r[1]?'✅':'⚠️'} ${r[0]}</div>`).join('');
+  if(v.t === 'lights') return `<div class="shk-lights">${v.s.map(c=>`<b class="${c}"></b>`).join('')}</div><div class="hcap">${v.cap||''}</div>`;
+  return '';
+}
+function renderShk(){
+  if(typeof SHK_DATA === 'undefined') return '';
+  const H = SHK_DATA.hook, at = shkStep, total = H.steps.length; let hook;
+  if(at === -1){
+    hook = `<div class="panel shk"><div class="tag">🎬 Story Hook</div><p style="margin:4px 0">Story skipped. <button class="shk-skip" onclick="shkGo(0)">Watch it after all</button></p></div>`;
+  } else {
+    let body = ''; for(let k=0;k<=Math.min(at,total-1);k++){ const st = H.steps[k]; body += `<div class="shk-step ${st.note?'shk-note':''}"><p>${st.text}</p>${shkVis(st.vis)}</div>`; }
+    const dots = H.steps.map((_,k)=>`<span class="${k<=at?'on':''}"></span>`).join('');
+    hook = `<div class="panel shk" id="shk"><div class="tag">🎬 Story Hook &mdash; ${H.title}</div><div class="shk-dots">${dots}</div>${body}
+      ${at < total-1 ? `<div class="btnrow" style="justify-content:center"><button class="btn big" onclick="shkGo(${at+1})">Next ▶ (${at+2} of ${total})</button></div><div style="text-align:center"><button class="shk-skip" onclick="shkGo(-1)">Skip the story</button></div>` : ''}</div>`;
+  }
+  const tags = SHK_DATA.tags.map(t => `<div class="ntag"><div class="nt-h">🏷️ NAME TAG &mdash; ${t.word}</div><p>${t.why}</p><div class="nt-ex">${t.ex.map(e=>`<span>${e}</span>`).join('')}</div><p class="nt-eng">🔧 ${t.eng}</p></div>`).join('');
+  return hook + `<div class="panel">${tags}</div>`;
+}
+function shkGo(n){ shkStep = n; render(); const el = document.getElementById('shk'); if(el && el.scrollIntoView) el.scrollIntoView({block:'nearest', behavior:'smooth'}); }
+
+const SHK_DATA = {"hook": {"title": "UFO Cloning", "steps": [{"text": "🛸 One UFO clones itself <b>every hour</b>: every UFO becomes 2. After 4 hours? That is <b>2 × 2 × 2 × 2 = 16</b>.", "vis": {"t": "double", "n": 4, "cap": "2⁴ = 2×2×2×2 = 16 (not 2×4 = 8!)"}}, {"text": "A <b>landing pad</b> 3 UFOs wide and 3 long holds <b>3² = 9</b> UFOs. Stack 3 pads high and you get <b>3³ = 27</b>.", "vis": {"t": "grids", "list": [{"r": 3, "c": 3, "cap": "3² = 9 (squared)"}]}}, {"note": true, "text": "🔧 <b>Engineer's Note:</b> A <b>power</b> = repeated multiplication. The small raised number (the <b>exponent</b>) says <b>how many times</b> to multiply. <b>Squared</b> = a square pad. <b>Cubed</b> = a cube of stacked pads."}]}, "tags": [{"word": "POWER / EXPONENT", "why": "<b>Exponent</b> comes from Latin for <b>&ldquo;put out&rdquo;</b>: the little number put up high. It tells you how many copies to multiply.", "ex": ["2⁴ = 16", "3² = 9", "3³ = 27"], "eng": "2⁴ means 2 × 2 × 2 × 2. It does NOT mean 2 × 4."}]};
+
 render();
 </script>
 </body>

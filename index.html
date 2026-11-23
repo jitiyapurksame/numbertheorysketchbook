@@ -111,6 +111,68 @@
   .storagenote{
     font-size:11.5px; color:var(--text-ink-soft); text-align:center; margin-top:22px; padding:0 10px; line-height:1.5;
   }
+
+  /* ---- Ship's Log: backup & restore ---- */
+  .logcard{ background:#fff; border-radius:var(--radius); padding:16px; margin-top:22px; border:1px solid #DCE3E8; box-shadow:0 2px 10px rgba(15,54,82,0.08); }
+  .logtitle{ font-family:'Space Mono',monospace; font-weight:700; font-size:15px; color:var(--bg-blueprint); }
+  .logdesc{ font-size:12.5px; color:var(--text-ink-soft); margin-top:4px; line-height:1.5; }
+  .logstep{ font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent-brass-dark); margin:16px 0 6px; }
+  .codebox{ -webkit-user-select:text; user-select:text; -webkit-touch-callout:default; font-family:'Space Mono',monospace; font-weight:700; font-size:15px; letter-spacing:1px; line-height:1.6;
+    background:var(--bg-blueprint); color:var(--accent-brass-light); border:2px dashed var(--accent-brass); border-radius:10px; padding:12px; text-align:center; word-break:break-all; }
+  .codeinput{ -webkit-user-select:text; user-select:text; -webkit-touch-callout:default; width:100%; min-height:48px; padding:10px 12px; border-radius:10px; border:2px solid var(--line-blueprint-dim);
+    font-family:'Space Mono',monospace; font-size:16px; letter-spacing:1px; text-transform:uppercase; background:#fff; color:var(--text-ink); }
+  .logbtnrow{ display:flex; gap:10px; margin-top:10px; position:relative; }
+  .logbtn{ flex:1; min-height:44px; padding:10px; border-radius:10px; font-family:inherit; font-weight:700; font-size:14px; cursor:pointer; text-align:center;
+    display:flex; align-items:center; justify-content:center; border:2px solid var(--bg-blueprint); background:transparent; color:var(--bg-blueprint); touch-action:manipulation; }
+  .logbtn.primary{ background:var(--bg-blueprint); color:#fff; }
+  .logbtn:active{ opacity:.85; transform:scale(.99); }
+  .logbtnrow input[type=file]{ position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; pointer-events:none; }
+  .loglink{ background:none; border:none; padding:0 2px; min-height:44px; margin-top:2px; cursor:pointer; color:var(--text-ink-soft); font-family:inherit; font-size:12.5px; text-decoration:underline; touch-action:manipulation; }
+  .loglink[hidden]{ display:none; }
+  .logmeta{ font-family:'Space Mono',monospace; font-size:11px; color:var(--text-ink-soft); margin-top:8px; }
+  .logstatus{ display:none; margin-top:10px; padding:10px 12px; border-radius:10px; font-size:12.5px; line-height:1.5; }
+  .logstatus.show{ display:block; }
+  .logstatus.ok{ background:#E3F2EE; color:#27594F; border:1px solid rgba(76,154,139,.4); }
+  .logstatus.warn{ background:#FBEBD2; color:#7A5014; border:1px dashed var(--alert-dark); }
+  .logstatus.err{ background:#FBEBD2; color:#7A5014; border:1px solid var(--alert-dark); }
+  .previewbox{ display:none; margin-top:12px; background:var(--bg-paper); border-radius:10px; padding:12px; border:1px dashed var(--accent-brass-dark); }
+  .previewbox.show{ display:block; }
+  .prow{ font-size:12.5px; padding:4px 0; border-top:1px solid rgba(15,54,82,.08); display:flex; justify-content:space-between; gap:8px; }
+  .prow:first-child{ border-top:none; }
+  .prow .pdots{ font-family:'Space Mono',monospace; letter-spacing:1px; white-space:nowrap; }
+  .ptitle{ font-family:'Space Mono',monospace; font-weight:700; font-size:12.5px; color:var(--bg-blueprint); margin-bottom:6px; }
+
+  /* ---- Cargo ship (the app's own flagship) ---- */
+  .shipcard{ background:var(--bg-blueprint); color:#fff; border-radius:var(--radius); padding:16px; margin:14px 0; border:2px dashed var(--accent-brass); box-shadow:0 3px 12px rgba(15,54,82,.2); }
+  .shipcard .ship-eyebrow{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent-brass-light); }
+  .shipcard .ship-title{ font-family:'Space Mono',monospace; font-weight:700; font-size:19px; margin:6px 0 10px; }
+  .shipsvg{ width:100%; height:auto; display:block; border-radius:10px; }
+  .shipsvg .so *{ fill:none; stroke:#D9A441; stroke-width:1; stroke-dasharray:4 3; opacity:.65; }
+  .shipsvg .sp{ animation:shipPulse 1.3s ease-in-out infinite alternate; }
+  .shipsvg .sp *{ stroke:#FFD27A; stroke-width:1.6; }
+  @keyframes shipPulse{ from{ opacity:.45; } to{ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .shipsvg .sp{ animation:none; opacity:.9; } }
+  .shipmeter{ height:10px; background:rgba(255,255,255,.18); border-radius:6px; overflow:hidden; margin-top:12px; }
+  .shipmeter i{ display:block; height:100%; background:linear-gradient(90deg,var(--alert),#fff); border-radius:6px; transition:width .4s ease; }
+  .shipmeta{ font-family:'Space Mono',monospace; font-size:11.5px; color:var(--accent-brass-light); margin:8px 0 0; line-height:1.5; }
+  .shipnext{ display:flex; align-items:center; justify-content:center; text-align:center; min-height:48px; margin-top:12px; padding:10px 14px; border-radius:10px; background:var(--success); color:#fff; font-weight:700; font-size:15px; text-decoration:none; }
+  .shipnext:active{ opacity:.9; transform:scale(.99); }
+  .shiplaunch{ margin-top:12px; padding:12px; border-radius:10px; text-align:center; font-weight:700; background:#E3F2EE; color:#27594F; }
+  .shippick{ font-family:'Space Mono',monospace; font-size:11.5px; color:var(--accent-brass-light); margin:14px 0 8px; }
+  .shipparts{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .shippart{ min-height:48px; padding:6px 8px; border-radius:10px; cursor:pointer; text-align:left; background:rgba(255,255,255,.08); border:2px solid rgba(255,255,255,.25); color:#fff; font-family:inherit; font-size:12px; font-weight:600; line-height:1.25; touch-action:manipulation; }
+  .shippart small{ display:block; font-family:'Space Mono',monospace; font-weight:400; font-size:10px; color:rgba(255,255,255,.7); }
+  .shippart.done{ background:rgba(76,154,139,.28); border-color:rgba(76,154,139,.7); }
+  .shippart[aria-pressed="true"]{ border-color:var(--alert); background:rgba(224,164,88,.25); }
+  .shipgoal{ font-size:13.5px; line-height:1.55; color:rgba(255,255,255,.92); margin:12px 0 0; min-height:40px; }
+  .shipgoal b{ color:var(--accent-brass-light); }
+  .shipgoal a{ color:var(--alert); font-weight:700; }
+  .shipdemo{ background:none; border:none; color:rgba(255,255,255,.55); text-decoration:underline; font-family:inherit; font-size:11.5px; min-height:44px; cursor:pointer; touch-action:manipulation; margin-top:4px; }
+  .shipdemobanner{ background:#FBEBD2; color:#7A5014; border-radius:8px; padding:6px 10px; font-size:12px; margin-top:10px; font-weight:700; }
+
+  .shipsend{ display:flex; align-items:center; justify-content:center; text-align:center; min-height:48px; margin-top:10px; padding:10px 14px; border-radius:10px; border:2px solid var(--accent-brass); color:#fff; font-weight:700; font-size:14.5px; text-decoration:none; background:transparent; touch-action:manipulation; }
+  .shipsend:active{ opacity:.85; transform:scale(.99); }
+  .shipsendnote{ font-size:12px; line-height:1.5; color:rgba(255,255,255,.7); margin:6px 0 0; }
 </style>
 </head>
 <body>
@@ -123,6 +185,7 @@
 <div class="motto">🔧 STEP 1 BEATS PERFECTION — PICK A COMPARTMENT AND START</div>
 
 <main id="main"></main>
+<div id="logwrap" style="max-width:720px;margin:0 auto;padding:0 14px calc(30px + env(safe-area-inset-bottom));"></div>
 
 <script>
 const MODULES = [
@@ -142,6 +205,133 @@ const MODULES = [
   { n:14, file:'module14_proof.html',       key:'nts_m14_proof',    icon:'📓', title:'Proof',                theme:'Inspector\u2019s Logbook \u2014 Always, Sometimes, Never' },
   { n:15, file:'module15_olympiad.html',    key:'nts_m15_toolbox',  icon:'🧭', title:'Olympiad Toolbox',     theme:'Captain\u2019s Strategy Manual \u2014 parity, invariants, cases' }
 ];
+
+
+// ==SHIP-CORE-START==
+// Pure ship maths (no DOM) so verify.js can test it. Part i belongs to module i+1.
+const SHIP_PARTS = [
+  { n:1,  id:'keel',    name:'Keel' },
+  { n:2,  id:'hull',    name:'Hull & Watertight Walls' },
+  { n:3,  id:'stackA',  name:'Container Stack A' },
+  { n:4,  id:'bell',    name:'Ship\u2019s Bell' },
+  { n:5,  id:'tanks',   name:'Chemical Tanks' },
+  { n:6,  id:'engine',  name:'Engine Room' },
+  { n:7,  id:'rudder',  name:'Rudder' },
+  { n:8,  id:'stackB',  name:'Tall Container Stack' },
+  { n:9,  id:'tower',   name:'Bridge Tower & Clock' },
+  { n:10, id:'boats',   name:'Lifeboats' },
+  { n:11, id:'crane',   name:'Cargo Crane' },
+  { n:12, id:'funnel',  name:'Funnel' },
+  { n:13, id:'ballast', name:'Ballast Tanks' },
+  { n:14, id:'mast',    name:'Signal Mast' },
+  { n:15, id:'flag',    name:'Captain\u2019s Flag' }
+];
+// doneArr: stages finished per module (0-5); startedArr: has a save at all
+function shipStats(doneArr, startedArr){
+  const parts = SHIP_PARTS.map((p, i) => {
+    const done = Math.max(0, Math.min(5, doneArr[i] || 0)), started = !!startedArr[i];
+    const f = done / 5;
+    const op = done > 0 ? Math.max(0.5, 0.3 + 0.7 * f) : (started ? 0.3 : 0);   // any step shows something
+    return { n:p.n, id:p.id, done, f, op, full: done >= 5 };
+  });
+  const sum = parts.reduce((a, p) => a + p.f, 0);
+  const certified = parts.filter(p => p.full).length;
+  const pct = Math.round(sum / parts.length * 100);
+  let next = parts.find(p => p.done > 0 && !p.full);
+  let mode = 'keep';
+  if(!next){ next = parts.find(p => p.done === 0); mode = 'start'; }
+  if(!next){ mode = 'launch'; }
+  return { parts, certified, pct, next: next ? next.n : null, mode };
+}
+// ==SHIP-CORE-END==
+
+// ==BACKUP-CORE-START==
+// Pure helpers (no page/DOM use) so verify.js can test them: the Restore Code and the backup bundle.
+const CODE_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';   // no I, L, O, U — nothing to mix up
+const CODE_VERSION = 1;
+
+function crc16(bytes){
+  let crc = 0xFFFF;
+  for(const b of bytes){
+    crc ^= (b << 8);
+    for(let i=0;i<8;i++){ crc = (crc & 0x8000) ? (((crc << 1) ^ 0x1021) & 0xFFFF) : ((crc << 1) & 0xFFFF); }
+  }
+  return crc;
+}
+// completedList: 15 arrays of 5 booleans  ->  "NTS-XXXXX-XXXXX-XXXXX-XXXXX"
+function encodeRestoreCode(completedList){
+  const bits = [];
+  for(let v=4; v>=0; v--) bits.push((CODE_VERSION >> v) & 1);               // 5 version bits
+  for(let m=0;m<15;m++) for(let i=0;i<5;i++) bits.push(completedList[m] && completedList[m][i] ? 1 : 0);   // 75 progress bits
+  const bytes = [];
+  for(let i=0;i<80;i+=8){ let b=0; for(let j=0;j<8;j++) b = (b<<1) | bits[i+j]; bytes.push(b); }
+  const crc = crc16(bytes);
+  bytes.push(crc >> 8, crc & 255);                                           // 12 bytes = 96 bits
+  const all = [];
+  bytes.forEach(b => { for(let j=7;j>=0;j--) all.push((b>>j)&1); });
+  while(all.length % 5) all.push(0);                                         // pad to 100 bits
+  let chars = '';
+  for(let i=0;i<all.length;i+=5){ let n=0; for(let j=0;j<5;j++) n = (n<<1) | all[i+j]; chars += CODE_ALPHABET[n]; }
+  return 'NTS-' + chars.match(/.{5}/g).join('-');
+}
+// text -> {ok:true, completed:[15 x 5 booleans]} or {ok:false, reason}
+function decodeRestoreCode(text){
+  let t = String(text == null ? '' : text).toUpperCase().replace(/[\s\-_]/g,'');
+  if(t.startsWith('NTS')) t = t.slice(3);
+  t = t.replace(/O/g,'0').replace(/[IL]/g,'1');
+  if(t.length !== 20) return { ok:false, reason:'length' };
+  const all = [];
+  for(const ch of t){
+    const n = CODE_ALPHABET.indexOf(ch);
+    if(n < 0) return { ok:false, reason:'chars' };
+    for(let j=4;j>=0;j--) all.push((n>>j)&1);
+  }
+  const bytes = [];
+  for(let i=0;i<96;i+=8){ let b=0; for(let j=0;j<8;j++) b = (b<<1) | all[i+j]; bytes.push(b); }
+  const data = bytes.slice(0,10), crc = (bytes[10]<<8) | bytes[11];
+  if(crc16(data) !== crc) return { ok:false, reason:'checksum' };
+  const bits = [];
+  data.forEach(b => { for(let j=7;j>=0;j--) bits.push((b>>j)&1); });
+  const version = bits.slice(0,5).reduce((a,b)=>(a<<1)|b, 0);
+  if(version !== CODE_VERSION) return { ok:false, reason:'version' };
+  const completed = [];
+  for(let m=0;m<15;m++){ const row=[]; for(let i=0;i<5;i++) row.push(bits[5+m*5+i] === 1); completed.push(row); }
+  return { ok:true, completed };
+}
+// Adding a code never takes progress away: a stage counts as done if EITHER side has it done.
+// existingRaw: the module's saved JSON text (or null). Returns the JSON text to save.
+function mergeCodeIntoRaw(existingRaw, completedRow){
+  let obj = null;
+  try{ obj = existingRaw ? JSON.parse(existingRaw) : null; }catch(e){ obj = null; }
+  if(!obj || typeof obj !== 'object' || Array.isArray(obj)) obj = {};
+  const old = Array.isArray(obj.completed) ? obj.completed : [];
+  obj.completed = [0,1,2,3,4].map(i => !!old[i] || !!completedRow[i]);
+  return JSON.stringify(obj);
+}
+// Full backup bundle (JSON text) from {key: rawText|null}
+function buildBundle(rawByKey, completedList, whenISO){
+  return JSON.stringify({ app:'jj-number-theory-backup', version:1, exportedAt:whenISO,
+    code: encodeRestoreCode(completedList), data: rawByKey }, null, 2);
+}
+// Reads and cleans a bundle. keys = the 15 known storage keys. Returns {ok, data:{key:rawText}, skipped, exportedAt} or {ok:false, reason}
+function readBundle(text, keys){
+  let parsed;
+  try{ parsed = JSON.parse(text); }catch(e){ return { ok:false, reason:'json' }; }
+  if(!parsed || typeof parsed !== 'object' || parsed.app !== 'jj-number-theory-backup' || !parsed.data || typeof parsed.data !== 'object') return { ok:false, reason:'shape' };
+  const data = {}; let skipped = 0;
+  keys.forEach(k => {
+    let raw = parsed.data[k];
+    if(raw == null) return;
+    if(typeof raw !== 'string'){ try{ raw = JSON.stringify(raw); }catch(e){ skipped++; return; } }
+    let obj = null;
+    try{ obj = JSON.parse(raw); }catch(e){ obj = null; }
+    if(!obj || typeof obj !== 'object' || !Array.isArray(obj.completed)){ skipped++; return; }
+    data[k] = raw;
+  });
+  if(!Object.keys(data).length) return { ok:false, reason:'empty' };
+  return { ok:true, data, skipped, exportedAt: parsed.exportedAt || null };
+}
+// ==BACKUP-CORE-END==
 
 function readProgress(key){
   if(!key) return null;
@@ -177,6 +367,7 @@ function render(){
     <div class="vstat">${totalDone} / ${totalPossible} stages logged across ${builtModules.length} built compartment${builtModules.length===1?'':'s'}</div>
     <div class="progresstrack"><div class="progressfill" style="width:${pct}%"></div></div>
   </div>
+  ${renderShipCard()}
   <div class="sectionlabel">Ready to Sail</div>`;
 
   MODULES.filter(m=>m.key!==null).forEach(m=>{ html += renderCard(m); });
@@ -219,7 +410,292 @@ function renderCard(m){
   </a>`;
 }
 
+const SHIP_SHAPES = {
+  keel:'<path d="M112,172 L520,172 L506,184 Q484,191 462,191 L160,191 Q130,191 112,172 Z" fill="#8A5A18"/><rect x="150" y="186" width="320" height="4" rx="2" fill="#D9A441"/>',
+  hull:'<path d="M92,124 L548,124 Q532,158 504,172 L112,172 Q96,152 92,124 Z" fill="#34556F"/><rect x="94" y="132" width="452" height="4" fill="#C85A4A"/><path d="M200,136 L200,170 M300,136 L300,172 M400,136 L400,172 M480,136 L480,166" stroke="#1F3A50" stroke-width="3" fill="none"/>',
+  ballast:'<rect x="308" y="150" width="76" height="16" rx="3" fill="#4C9A8B"/><rect x="408" y="150" width="76" height="16" rx="3" fill="#4C9A8B"/><path d="M318,158 L374,158 M418,158 L474,158" stroke="#E3F2EE" stroke-width="2" fill="none"/>',
+  engine:'<rect x="116" y="140" width="76" height="26" rx="4" fill="#16293A" stroke="#D9A441" stroke-width="1.5"/><circle cx="136" cy="153" r="8" fill="#D9A441"/><circle cx="136" cy="153" r="3" fill="#16293A"/><rect x="154" y="144" width="8" height="18" fill="#D9A441"/><rect x="168" y="144" width="8" height="18" fill="#D9A441"/>',
+  rudder:'<path d="M100,150 L84,150 L78,190 L102,178 Z" fill="#5B6B78"/>',
+  tower:'<rect x="112" y="64" width="58" height="60" fill="#F1ECDD"/><rect x="108" y="58" width="66" height="6" fill="#C85A4A"/><rect x="118" y="106" width="46" height="8" rx="1" fill="#0E2A45"/><rect x="118" y="72" width="14" height="10" rx="1" fill="#0E2A45"/><rect x="150" y="72" width="14" height="10" rx="1" fill="#0E2A45"/><circle cx="141" cy="90" r="9" fill="#fff" stroke="#0E2A45" stroke-width="2"/><path d="M141,90 L141,84 M141,90 L146,92" stroke="#0E2A45" stroke-width="2" fill="none"/>',
+  funnel:'<path d="M180,124 L184,80 L202,80 L206,124 Z" fill="#C85A4A"/><rect x="183" y="75" width="21" height="6" fill="#16293A"/><rect x="182" y="98" width="23" height="6" fill="#D9A441"/>',
+  boats:'<path d="M214,112 L236,112 Q234,122 228,124 L220,124 Q214,120 214,112 Z" fill="#E0A458" stroke="#8A5A18" stroke-width="1.5"/><path d="M240,112 L262,112 Q260,122 254,124 L246,124 Q240,120 240,112 Z" fill="#E0A458" stroke="#8A5A18" stroke-width="1.5"/>',
+  stackA:'<rect x="272" y="100" width="28" height="24" fill="#C85A4A" stroke="#16293A" stroke-width="1.5"/><rect x="300" y="100" width="28" height="24" fill="#E0A458" stroke="#16293A" stroke-width="1.5"/><rect x="272" y="76" width="28" height="24" fill="#4C9A8B" stroke="#16293A" stroke-width="1.5"/><rect x="300" y="76" width="28" height="24" fill="#6FA6BE" stroke="#16293A" stroke-width="1.5"/>',
+  stackB:'<rect x="336" y="100" width="28" height="24" fill="#6FA6BE" stroke="#16293A" stroke-width="1.5"/><rect x="364" y="100" width="28" height="24" fill="#C85A4A" stroke="#16293A" stroke-width="1.5"/><rect x="336" y="76" width="28" height="24" fill="#E0A458" stroke="#16293A" stroke-width="1.5"/><rect x="364" y="76" width="28" height="24" fill="#4C9A8B" stroke="#16293A" stroke-width="1.5"/><rect x="336" y="52" width="28" height="24" fill="#C85A4A" stroke="#16293A" stroke-width="1.5"/><rect x="364" y="52" width="28" height="24" fill="#6FA6BE" stroke="#16293A" stroke-width="1.5"/>',
+  tanks:'<rect x="400" y="102" width="22" height="22" rx="8" fill="#F1ECDD" stroke="#0F3652" stroke-width="1.5"/><rect x="426" y="102" width="22" height="22" rx="8" fill="#F1ECDD" stroke="#0F3652" stroke-width="1.5"/><rect x="400" y="110" width="22" height="6" fill="#4C9A8B"/><rect x="426" y="110" width="22" height="6" fill="#E0A458"/>',
+  crane:'<rect x="462" y="60" width="12" height="64" fill="#D9A441"/><path d="M468,60 L520,50 L520,55 L468,67 Z" fill="#D9A441"/><rect x="454" y="54" width="10" height="10" fill="#8A5A18"/><path d="M516,53 L516,88" stroke="#16293A" stroke-width="2" fill="none"/><rect x="512" y="88" width="8" height="6" fill="#16293A"/>',
+  bell:'<rect x="524" y="104" width="3" height="20" fill="#8A5A18"/><path d="M517,108 Q517,97 526,97 Q535,97 535,108 Z" fill="#E0A458" stroke="#8A5A18" stroke-width="1.5"/><circle cx="526" cy="111" r="2.5" fill="#8A5A18"/>',
+  mast:'<rect x="139" y="20" width="4" height="44" fill="#F1ECDD"/><rect x="128" y="30" width="26" height="3" fill="#F1ECDD"/><circle cx="141" cy="22" r="4" fill="#E0A458"/>',
+  flag:'<rect x="139" y="6" width="4" height="16" fill="#F1ECDD"/><path d="M143,6 L178,12 L143,19 Z" fill="#C85A4A"/>'
+};
+const HUB_URL = 'https://jj-engineer-port.vercel.app/';
+let shipPick = null, demoLevel = 0;
+function sendToHub(a){
+  const list = allCompleted();
+  if(!countDone(list)) return false;
+  a.href = HUB_URL + '#nts=' + encodeURIComponent(encodeRestoreCode(list));   // the code only holds which stages are done
+  return true;
+}
+const DEMO_STEPS = [0, 5, 10, 15];
+function shipInputs(){
+  if(demoLevel > 0){ const k = DEMO_STEPS[demoLevel]; return { done: MODULES.map((m,i)=> i < k ? 5 : 0), started: MODULES.map((m,i)=> i < k) }; }
+  return { done: MODULES.map(m => readCompletedRow(m.key).filter(Boolean).length), started: MODULES.map(m => !!readRaw(m.key)) };
+}
+function shipSvg(st, pickId){
+  let built = '', outline = '', pre = '';
+  st.parts.forEach(p => {
+    built += `<g style="opacity:${p.op}">${SHIP_SHAPES[p.id]}</g>`;
+    outline += `<g class="so">${SHIP_SHAPES[p.id]}</g>`;
+    if(p.id === pickId) pre = `<g class="sp">${SHIP_SHAPES[p.id]}</g>`;
+  });
+  const sea = '<path d="M0,172 Q40,164 80,172 T160,172 T240,172 T320,172 T400,172 T480,172 T560,172 T640,172 L640,225 L0,225 Z" fill="#2a6a9c" opacity="0.4"/>';
+  return `<svg class="shipsvg" viewBox="0 0 620 225" role="img" aria-label="Your cargo ship under construction"><rect width="620" height="172" fill="#0b2237" opacity="0.5"/>${built}${pre}${sea}${outline}</svg>`;
+}
+function shipInner(){
+  const inp = shipInputs(), st = shipStats(inp.done, inp.started);
+  const pick = shipPick ? SHIP_PARTS.find(p => p.n === shipPick) : null;
+  let html = `<div class="ship-eyebrow">The Number Theory Cargo Ship</div><h2 class="ship-title">🚢 S.S. Number Cruncher</h2>`;
+  if(demoLevel > 0) html += `<div class="shipdemobanner">🧪 PREVIEW ONLY &mdash; pretending ${DEMO_STEPS[demoLevel]} modules are finished. Not J.J.&rsquo;s real progress.</div>`;
+  html += shipSvg(st, pick ? pick.id : null);
+  html += `<div class="shipmeter" aria-label="Build progress"><i style="width:${st.pct}%"></i></div>
+    <p class="shipmeta">${st.certified} of 15 parts certified &mdash; ship ${st.pct}% built. Every stage you finish adds a piece!</p>`;
+  if(st.mode === 'launch') html += `<div class="shiplaunch">🎉 ALL SYSTEMS GO! S.S. Number Cruncher is ready to launch.</div>`;
+  else {
+    const m = MODULES[st.next - 1], p = SHIP_PARTS[st.next - 1];
+    html += `<a class="shipnext" href="${m.file}">${st.mode === 'keep' ? 'Keep building' : 'Start here'}: ${p.name} &rarr; Module ${m.n}</a>`;
+  }
+  if(demoLevel === 0){
+    if(countDone(allCompleted()) > 0){
+      html += `<a class="shipsend" href="${HUB_URL}" target="_blank" rel="noopener" onclick="return sendToHub(this)">📡 Send my ship to the Hub</a>
+        <p class="shipsendnote">Opens the Hub so it lights up S.S. Number Cruncher in the Fleet. Hub on your home screen? Copy your code in the Ship&rsquo;s Log below and paste it into the Number Theory card there.</p>`;
+    } else {
+      html += `<p class="shipsendnote">Finish one stage, then you can send your ship to the Hub.</p>`;
+    }
+  }
+  html += `<div class="shippick">TAP A PART TO SEE WHICH MODULE BUILDS IT</div><div class="shipparts">`;
+  SHIP_PARTS.forEach((p, i) => {
+    const d = inp.done[i];
+    html += `<button class="shippart ${d >= 5 ? 'done' : ''}" type="button" aria-pressed="${shipPick === p.n}" onclick="pickPart(${p.n})">${d >= 5 ? '✅' : MODULES[i].icon} ${p.name}<small>Module ${p.n} &middot; ${d}/5</small></button>`;
+  });
+  html += `</div><p class="shipgoal">`;
+  if(pick){
+    const m = MODULES[pick.n - 1], d = inp.done[pick.n - 1];
+    html += `<b>Module ${m.n} &middot; ${m.title}</b> builds the <b>${pick.name}</b>. ` +
+      (d >= 5 ? '✅ It is built!' : d === 0 ? 'Do just <b>ONE stage</b> and the part appears. ' : `${5 - d} more stage${5 - d === 1 ? '' : 's'} to finish it. `) +
+      (demoLevel > 0 ? '' : `<a href="${m.file}">Open Module ${m.n} &rarr;</a>`);
+  } else html += 'Tap a part above and it glows on the ship.';
+  html += `</p><button class="shipdemo" type="button" onclick="cycleDemo()">${demoLevel > 0 ? 'Turn preview off' : '🧪 Parent preview: show a half-built ship'}</button>`;
+  return html;
+}
+function renderShipCard(){ return `<div class="shipcard" id="shipcard">${shipInner()}</div>`; }
+function pickPart(n){ shipPick = shipPick === n ? null : n; document.getElementById('shipcard').innerHTML = shipInner(); }
+function cycleDemo(){ demoLevel = (demoLevel + 1) % DEMO_STEPS.length; document.getElementById('shipcard').innerHTML = shipInner(); }
+
+// ---- Ship's Log: backup & restore (screen part) ----
+const MODULE_KEYS = MODULES.map(m => m.key);
+function readRaw(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
+function readCompletedRow(key){
+  let obj = null;
+  try{ const raw = readRaw(key); obj = raw ? JSON.parse(raw) : null; }catch(e){ obj = null; }
+  const c = obj && Array.isArray(obj.completed) ? obj.completed : [];
+  return [0,1,2,3,4].map(i => !!c[i]);
+}
+function allCompleted(){ return MODULES.map(m => readCompletedRow(m.key)); }
+function dotsText(row){ return row.map(b => b ? '\u25CF' : '\u25CB').join(''); }
+function countDone(list){ return list.reduce((a,row)=>a+row.filter(Boolean).length, 0); }
+
+function showLogStatus(msg, kind){ const el = document.getElementById('logstatus'); el.textContent = msg; el.className = 'logstatus show ' + kind; }
+function hideLogStatus(){ document.getElementById('logstatus').className = 'logstatus'; }
+
+function buildLog(){
+  document.getElementById('logwrap').innerHTML = `
+  <div class="logcard">
+    <div class="logtitle">📋 Ship&rsquo;s Log &mdash; Save &amp; Restore</div>
+    <div class="logdesc">Your progress lives on this iPad only. Save a code so the Chief Engineer never loses the blueprints. Step 1: tap <b>Copy My Code</b> and paste it into Notes.</div>
+
+    <div class="logstep">① My Restore Code</div>
+    <div class="codebox" id="mycode" aria-live="polite"></div>
+    <div class="logbtnrow"><button class="logbtn primary" id="btn-copy" type="button">📋 Copy My Code</button></div>
+    <div class="logdesc" style="margin-top:6px">The code remembers which stages you finished in all 15 compartments.</div>
+
+    <div class="logstep">② Got a code? Put it back</div>
+    <input class="codeinput" id="code-input" type="text" inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="NTS-XXXXX-XXXXX-XXXXX-XXXXX" aria-label="Restore code">
+    <div class="logbtnrow"><button class="logbtn" id="btn-check" type="button">🔍 Check Code</button></div>
+    <div class="previewbox" id="code-preview">
+      <div class="ptitle">This code remembers:</div>
+      <div id="code-rows"></div>
+      <div class="logdesc" style="margin-top:8px">It only <b>adds</b> stages. It never erases what is already on this iPad.</div>
+      <div class="logbtnrow"><button class="logbtn" id="btn-code-cancel" type="button">Cancel</button><button class="logbtn primary" id="btn-code-ok" type="button">✅ Add This Progress</button></div>
+    </div>
+
+    <div class="logstep">③ Full backup file (everything, even half-finished stages)</div>
+    <div class="logbtnrow">
+      <button class="logbtn primary" id="btn-export" type="button">⬇ Save Backup File</button>
+      <label class="logbtn" for="file-import">⬆ Load Backup File</label>
+      <input type="file" id="file-import" accept="application/json,.json">
+    </div>
+    <button class="loglink" id="btn-download" type="button" hidden>Prefer a plain download? Tap here.</button>
+    <div class="logdesc">On iPad, Save opens the share sheet &mdash; choose &ldquo;Save to Files&rdquo;.</div>
+    <div class="logmeta" id="logmeta">No backup file saved yet this session.</div>
+    <div class="previewbox" id="file-preview">
+      <div class="ptitle">This backup file contains:</div>
+      <div id="file-rows"></div>
+      <div class="logbtnrow"><button class="logbtn" id="btn-file-cancel" type="button">Cancel</button><button class="logbtn primary" id="btn-file-ok" type="button">Restore This Backup</button></div>
+    </div>
+
+    <div class="logstatus" id="logstatus"></div>
+  </div>`;
+
+  let pendingCode = null, pendingFile = null;
+
+  document.getElementById('btn-copy').addEventListener('click', function(){
+    hideLogStatus();
+    const code = encodeRestoreCode(allCompleted());
+    const done = () => showLogStatus('Code copied! Paste it into Notes or Messages and keep it safe.', 'ok');
+    const fallback = () => {
+      const box = document.getElementById('mycode');
+      try{ const r = document.createRange(); r.selectNodeContents(box); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); }catch(e){}
+      showLogStatus('Press and hold the code, then tap Copy.', 'warn');
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(code).then(done, fallback); }
+    else fallback();
+  });
+
+  document.getElementById('btn-check').addEventListener('click', function(){
+    hideLogStatus();
+    const res = decodeRestoreCode(document.getElementById('code-input').value);
+    if(!res.ok){
+      const why = { length:'That code looks too short or too long. Check it against the original.', chars:'That code has a character that doesn\u2019t belong. Check it against the original.',
+                    checksum:'That code doesn\u2019t pass the check. One letter is probably off \u2014 look again.', version:'This code is from a different version of the app.' }[res.reason];
+      showLogStatus(why || 'That code did not work.', 'err');
+      document.getElementById('code-preview').classList.remove('show'); pendingCode = null; return;
+    }
+    const now = allCompleted();
+    let rows = '', adds = 0;
+    MODULES.forEach((m,i) => {
+      const row = res.completed[i];
+      if(!row.some(Boolean)) return;
+      const gain = row.filter((b,j) => b && !now[i][j]).length; adds += gain;
+      rows += `<div class="prow"><span>${m.icon} ${m.n}. ${m.title}</span><span class="pdots">${dotsText(row)}</span></div>`;
+    });
+    if(!rows) rows = '<div class="prow"><span>A fresh code with no finished stages yet.</span></div>';
+    document.getElementById('code-rows').innerHTML = rows;
+    document.getElementById('code-preview').classList.add('show');
+    pendingCode = res;
+    if(adds === 0) showLogStatus('Good news: this iPad already has everything in this code.', 'ok');
+  });
+  document.getElementById('btn-code-cancel').addEventListener('click', function(){ pendingCode = null; document.getElementById('code-preview').classList.remove('show'); });
+  document.getElementById('btn-code-ok').addEventListener('click', function(){
+    if(!pendingCode) return;
+    let failed = 0;
+    MODULES.forEach((m,i) => {
+      const row = pendingCode.completed[i];
+      if(!row.some(Boolean)) return;
+      try{ localStorage.setItem(m.key, mergeCodeIntoRaw(readRaw(m.key), row)); }catch(e){ failed++; }
+    });
+    pendingCode = null;
+    document.getElementById('code-preview').classList.remove('show');
+    document.getElementById('code-input').value = '';
+    if(failed) showLogStatus('This browser would not let me save. Open the Sketchbook from its web address (not a file) and try again.', 'err');
+    else showLogStatus('Progress added! Check the badges above.', 'ok');
+    render(); refreshLog();
+  });
+
+  // ---- file export ----
+  function buildFileBackup(){
+    const raws = {}; let found = false;
+    MODULES.forEach(m => { const r = readRaw(m.key); raws[m.key] = r || null; if(r) found = true; });
+    if(!found){ showLogStatus('Nothing to save yet \u2014 finish a stage in any compartment first.', 'warn'); return null; }
+    const d = new Date();
+    const stamp = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    return { text: buildBundle(raws, allCompleted(), d.toISOString()), fileName: 'nts-progress-' + stamp + '.json', when: d };
+  }
+  function markSaved(when){ document.getElementById('logmeta').textContent = 'Last saved: ' + when.toLocaleString(); }
+  function downloadFile(b){
+    const blob = new Blob([b.text], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = b.fileName;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    markSaved(b.when);
+    showLogStatus('Backup downloaded. Keep it somewhere safe (Files, email, cloud drive).', 'ok');
+  }
+  function makeFile(b){ try{ return new File([b.text], b.fileName, { type:'application/json' }); }catch(e){ return null; } }
+  function canShare(file){
+    try{ return !!(file && navigator.share && navigator.canShare && navigator.maxTouchPoints > 0 && navigator.canShare({ files:[file] })); }catch(e){ return false; }
+  }
+  document.getElementById('btn-export').addEventListener('click', function(){
+    hideLogStatus();
+    const b = buildFileBackup(); if(!b) return;
+    const file = makeFile(b);
+    if(!canShare(file)){ downloadFile(b); return; }
+    navigator.share({ files:[file], title:'Number Theory backup' }).then(function(){
+      markSaved(b.when); showLogStatus('Backup shared. Make sure you chose a safe place (Save to Files, email, or a cloud drive).', 'ok');
+    }).catch(function(err){
+      if(err && err.name === 'AbortError') showLogStatus('Share cancelled \u2014 no backup was saved. Tap Save Backup File again whenever you\u2019re ready.', 'warn');
+      else downloadFile(b);
+    });
+  });
+  (function(){
+    const link = document.getElementById('btn-download');
+    let probe = null; try{ probe = new File(['{}'], 'probe.json', { type:'application/json' }); }catch(e){}
+    if(!canShare(probe)) return;
+    link.hidden = false;
+    link.addEventListener('click', function(){ hideLogStatus(); const b = buildFileBackup(); if(b) downloadFile(b); });
+  })();
+
+  // ---- file import ----
+  document.getElementById('file-import').addEventListener('change', function(e){
+    hideLogStatus();
+    const file = e.target.files && e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(){
+      const res = readBundle(String(reader.result), MODULE_KEYS);
+      e.target.value = '';
+      if(!res.ok){
+        showLogStatus(res.reason === 'json' ? 'That file isn\u2019t readable.' : res.reason === 'empty' ? 'That backup has no readable progress in it.' : 'That doesn\u2019t look like a Number Theory backup file.', 'err');
+        document.getElementById('file-preview').classList.remove('show'); pendingFile = null; return;
+      }
+      let rows = '<div class="prow"><span>Saved: ' + (res.exportedAt ? new Date(res.exportedAt).toLocaleString() : 'unknown date') + '</span></div>';
+      let warns = '';
+      MODULES.forEach((m,i) => {
+        const raw = res.data[m.key]; if(!raw) return;
+        const row = [0,1,2,3,4].map(j => !!JSON.parse(raw).completed[j]);
+        rows += `<div class="prow"><span>${m.icon} ${m.n}. ${m.title}</span><span class="pdots">${dotsText(row)}</span></div>`;
+        const have = readCompletedRow(m.key).filter(Boolean).length;
+        if(have > row.filter(Boolean).length) warns += `<div class="prow" style="color:#7A5014">⚠ This iPad has more stages done in ${m.title} (${have}) than the backup. Restoring will replace them.</div>`;
+      });
+      if(res.skipped) rows += `<div class="prow"><span>Skipped ${res.skipped} unreadable entr${res.skipped===1?'y':'ies'}.</span></div>`;
+      document.getElementById('file-rows').innerHTML = rows + warns;
+      document.getElementById('file-preview').classList.add('show');
+      pendingFile = res;
+    };
+    reader.readAsText(file);
+  });
+  document.getElementById('btn-file-cancel').addEventListener('click', function(){ pendingFile = null; document.getElementById('file-preview').classList.remove('show'); });
+  document.getElementById('btn-file-ok').addEventListener('click', function(){
+    if(!pendingFile) return;
+    let restored = 0, failed = 0;
+    Object.keys(pendingFile.data).forEach(k => { try{ localStorage.setItem(k, pendingFile.data[k]); restored++; }catch(e){ failed++; } });
+    pendingFile = null;
+    document.getElementById('file-preview').classList.remove('show');
+    if(failed) showLogStatus('This browser would not let me save. Open the Sketchbook from its web address (not a file) and try again.', 'err');
+    else showLogStatus('Progress restored! Check the badges above.', 'ok');
+    render(); refreshLog();
+  });
+}
+
+function refreshLog(){
+  const list = allCompleted();
+  const box = document.getElementById('mycode');
+  if(!box) return;
+  box.textContent = countDone(list) ? encodeRestoreCode(list) : 'Finish one stage and your first code appears here.';
+  document.getElementById('btn-copy').disabled = !countDone(list);
+  document.getElementById('btn-copy').style.opacity = countDone(list) ? '1' : '0.5';
+}
+
 render();
+buildLog();
+refreshLog();
 </script>
 </body>
 </html>
